@@ -1,0 +1,9 @@
+<%- include('layout') %>
+
+<h2>Welcome to TravelTales!</h2>
+
+<% if (session && session.user) { %>
+  <p>You are logged in as <strong><%= session.user.name %></strong></p>
+<% } else { %>
+  <p>Please <a href="/login">log in</a> or <a href="/register">register</a> to get started.</p>
+<% } %>
