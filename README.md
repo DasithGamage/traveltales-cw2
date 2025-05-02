@@ -8,6 +8,8 @@ Includes country information, social features, and user-based blog management.
 - Session management
 - Logout functionality
 - Dynamic navigation bar based on user status
+- Blog post creation (title, content, country, visit date)
+- Blog listing with author on homepage
 
 ## Setup Instructions
 1. Clone the repository  
