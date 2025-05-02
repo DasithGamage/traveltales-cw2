@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes');
+const blogRoutes = require('./routes/blogRoutes'); // Added blog routes
 
 const app = express();
 const PORT = 3000;
@@ -26,12 +27,13 @@ app.use((req, res, next) => {
 });
 
 // Home route
-app.get('/', (req, res) => {
-  res.render('home'); // Make sure you have views/home.ejs
-});
+//app.get('/', (req, res) => {
+//  res.render('home'); // Make sure you have views/home.ejs
+//});
 
 // Route handling
 app.use('/', authRoutes);
+app.use('/', blogRoutes); // Registered blog routes
 
 // Start server
 app.listen(PORT, () => {

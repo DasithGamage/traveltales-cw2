@@ -1,0 +1,19 @@
+<%- include('layout') %>
+
+<h2>Create a Travel Blog Post</h2>
+
+<form action="/blog/create" method="POST">
+  <label for="title">Title:</label><br>
+  <input type="text" id="title" name="title" required><br><br>
+
+  <label for="content">Content:</label><br>
+  <textarea id="content" name="content" rows="6" cols="50" required></textarea><br><br>
+
+  <label for="country">Country:</label><br>
+  <input type="text" id="country" name="country"><br><br>
+
+  <label for="visit_date">Visit Date:</label><br>
+  <input type="date" id="visit_date" name="visit_date"><br><br>
+
+  <button type="submit">Post Blog</button>
+</form>

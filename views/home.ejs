@@ -4,6 +4,25 @@
 
 <% if (session && session.user) { %>
   <p>You are logged in as <strong><%= session.user.name %></strong></p>
+  <p><a href="/blog/create">Create a new blog post</a></p>
 <% } else { %>
   <p>Please <a href="/login">log in</a> or <a href="/register">register</a> to get started.</p>
+<% } %>
+
+<hr>
+
+<h3>Recent Blog Posts</h3>
+
+<% if (!blogs || blogs.length === 0) { %>
+  <p>No blog posts yet.</p>
+<% } else { %>
+  <% blogs.forEach(blog => { %>
+    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+      <h4><%= blog.title %></h4>
+      <p><em>By <%= blog.author %> on <%= blog.created_at.split('T')[0] %></em></p>
+      <% if (blog.country) { %><p>Country: <%= blog.country %></p><% } %>
+      <% if (blog.visit_date) { %><p>Visited on: <%= blog.visit_date %></p><% } %>
+      <p><%= blog.content %></p>
+    </div>
+  <% }) %>
 <% } %>
