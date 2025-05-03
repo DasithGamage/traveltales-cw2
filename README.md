@@ -10,6 +10,8 @@ Includes country information, social features, and user-based blog management.
 - Dynamic navigation bar based on user status
 - Blog post creation (title, content, country, visit date)
 - Blog listing with author on homepage
+- Edit blog posts (only by the author)
+- Delete blog posts (only by the author)
 
 ## Setup Instructions
 1. Clone the repository  
