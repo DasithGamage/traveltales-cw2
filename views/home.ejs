@@ -5,6 +5,11 @@
 <% if (session && session.user) { %>
   <p>You are logged in as <strong><%= session.user.name %></strong></p>
   <p><a href="/blog/create">Create a new blog post</a></p>
+
+  <% if (typeof followerCount !== 'undefined' && typeof followingCount !== 'undefined') { %>
+    <p><strong>Followers:</strong> <%= followerCount %></p>
+    <p><strong>Following:</strong> <%= followingCount %></p>
+  <% } %>
 <% } else { %>
   <p>Please <a href="/login">log in</a> or <a href="/register">register</a> to get started.</p>
 <% } %>
@@ -29,6 +34,18 @@
           <a href="/blog/edit/<%= blog.id %>">Edit</a> |
           <a href="/blog/delete/<%= blog.id %>" onclick="return confirm('Are you sure?')">Delete</a>
         </p>
+      <% } %>
+
+      <% if (session.user && session.user.id !== blog.user_id) { %>
+        <% if (blog.isFollowing) { %>
+          <form action="/unfollow/<%= blog.user_id %>" method="POST" style="display:inline;">
+            <button type="submit">Unfollow</button>
+          </form>
+        <% } else { %>
+          <form action="/follow/<%= blog.user_id %>" method="POST" style="display:inline;">
+            <button type="submit">Follow</button>
+          </form>
+        <% } %>
       <% } %>
     </div>
   <% }) %>

@@ -1,0 +1,20 @@
+<% users.forEach(user => { %>
+    <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+      <p><strong><%= user.name %></strong></p>
+  
+      <% if (session.user.id !== user.id) { %>
+        <% if (user.isFollowing) { %>
+          <form action="/unfollow/<%= user.id %>" method="POST" style="display:inline;">
+            <button type="submit">Unfollow</button>
+          </form>
+        <% } else { %>
+          <form action="/follow/<%= user.id %>" method="POST" style="display:inline;">
+            <button type="submit">Follow</button>
+          </form>
+        <% } %>
+      <% } else { %>
+        <p>(This is you)</p>
+      <% } %>
+    </div>
+  <% }) %>
+  

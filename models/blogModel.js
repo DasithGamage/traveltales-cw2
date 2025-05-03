@@ -36,6 +36,18 @@ const blogModel = {
   deleteBlog: (id, callback) => {
     const query = 'DELETE FROM blogs WHERE id = ?';
     db.run(query, [id], callback);
+  },
+
+  // New: Check if follower is following the blog's author
+  isFollowing: (followerId, followingId, callback) => {
+    const query = `
+      SELECT * FROM follows
+      WHERE follower_id = ? AND following_id = ?
+    `;
+    db.get(query, [followerId, followingId], (err, row) => {
+      if (err) return callback(err);
+      callback(null, !!row); // true if following
+    });
   }
 };
 

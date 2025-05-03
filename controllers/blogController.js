@@ -1,4 +1,5 @@
 const blogModel = require('../models/blogModel');
+const followModel = require('../models/followModel'); // Import followModel
 
 const blogController = {
   showCreateForm: (req, res) => {
@@ -22,12 +23,46 @@ const blogController = {
   },
 
   showAllBlogs: (req, res) => {
-    blogModel.getAllBlogs((err, blogs) => {
+    blogModel.getAllBlogs(async (err, blogs) => {
       if (err) {
         console.error(err);
         return res.send('Error loading blog posts.');
       }
-      res.render('home', { blogs });
+
+      if (req.session.user) {
+        const userId = req.session.user.id;
+
+        // Add isFollowing property for each blog author
+        for (const blog of blogs) {
+          if (blog.user_id === userId) {
+            blog.isOwnPost = true;
+          } else {
+            await new Promise((resolve) => {
+              blogModel.isFollowing(userId, blog.user_id, (err, isFollowing) => {
+                blog.isFollowing = isFollowing;
+                resolve();
+              });
+            });
+          }
+        }
+
+        // Get follower and following count
+        followModel.getFollowerCount(userId, (err1, followerResult) => {
+          if (err1) return res.send('Error fetching follower count');
+
+          followModel.getFollowingCount(userId, (err2, followingResult) => {
+            if (err2) return res.send('Error fetching following count');
+
+            res.render('home', {
+              blogs,
+              followerCount: followerResult.count,
+              followingCount: followingResult.count
+            });
+          });
+        });
+      } else {
+        res.render('home', { blogs });
+      }
     });
   },
 

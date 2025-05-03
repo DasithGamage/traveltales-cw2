@@ -11,20 +11,28 @@ db.run(`
   )
 `);
 
-// Export functions to use in controller later
 module.exports = {
+  // Create new user
   createUser: (name, email, hashedPassword, callback) => {
     const sql = `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`;
     db.run(sql, [name, email, hashedPassword], callback);
   },
 
+  // Find user by email
   findUserByEmail: (email, callback) => {
     const sql = `SELECT * FROM users WHERE email = ?`;
     db.get(sql, [email], callback);
   },
 
+  // Find user by ID
   findUserById: (id, callback) => {
     const sql = `SELECT * FROM users WHERE id = ?`;
     db.get(sql, [id], callback);
+  },
+
+  // Get all users except current one (used in follow system)
+  getAllExcept: (currentUserId, callback) => {
+    const sql = `SELECT * FROM users WHERE id != ?`;
+    db.all(sql, [currentUserId], callback);
   }
 };

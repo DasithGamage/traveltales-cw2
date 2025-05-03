@@ -3,6 +3,7 @@ const session = require('express-session');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const blogRoutes = require('./routes/blogRoutes'); // Added blog routes
+const followRoutes = require('./routes/followRoutes'); // Follow routes
 
 const app = express();
 const PORT = 3000;
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
 // Route handling
 app.use('/', authRoutes);
 app.use('/', blogRoutes); // Registered blog routes
+app.use('/', followRoutes); // Follow routes
 
 // Start server
 app.listen(PORT, () => {
