@@ -1,0 +1,19 @@
+<%- include('layout') %>
+
+<h2>Edit Blog Post</h2>
+
+<form method="POST">
+  <label>Title:</label><br>
+  <input type="text" name="title" value="<%= blog.title %>" required><br><br>
+
+  <label>Content:</label><br>
+  <textarea name="content" rows="6" required><%= blog.content %></textarea><br><br>
+
+  <label>Country:</label><br>
+  <input type="text" name="country" value="<%= blog.country %>"><br><br>
+
+  <label>Visit Date:</label><br>
+  <input type="date" name="visit_date" value="<%= blog.visit_date %>"><br><br>
+
+  <button type="submit">Update Blog</button>
+</form>

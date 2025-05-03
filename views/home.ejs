@@ -23,6 +23,13 @@
       <% if (blog.country) { %><p>Country: <%= blog.country %></p><% } %>
       <% if (blog.visit_date) { %><p>Visited on: <%= blog.visit_date %></p><% } %>
       <p><%= blog.content %></p>
+
+      <% if (session.user && session.user.id === blog.user_id) { %>
+        <p>
+          <a href="/blog/edit/<%= blog.id %>">Edit</a> |
+          <a href="/blog/delete/<%= blog.id %>" onclick="return confirm('Are you sure?')">Delete</a>
+        </p>
+      <% } %>
     </div>
   <% }) %>
 <% } %>

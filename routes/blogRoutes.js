@@ -11,4 +11,9 @@ router.get('/blog/create', blogController.showCreateForm);
 // Handle blog post submission
 router.post('/blog/create', blogController.createBlogPost);
 
+// Edit & Delete
+router.get('/blog/edit/:id', blogController.showEditForm);
+router.post('/blog/edit/:id', blogController.updateBlogPost);
+router.get('/blog/delete/:id', blogController.deleteBlogPost);
+
 module.exports = router;
