@@ -13,6 +13,7 @@ Includes country information, social features, and user-based blog management.
 - Edit blog posts (only by the author)
 - Delete blog posts (only by the author)
 - User Follow System and Profile-Based Social Interactions
+- Like/Dislike functionality for blog posts with real-time updates
 
 ## Setup Instructions
 1. Clone the repository  
