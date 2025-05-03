@@ -4,6 +4,7 @@ const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const blogRoutes = require('./routes/blogRoutes'); // Added blog routes
 const followRoutes = require('./routes/followRoutes'); // Follow routes
+const likeRoutes = require('./routes/likeRoutes'); // Likes routes
 
 const app = express();
 const PORT = 3000;
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 app.use('/', authRoutes);
 app.use('/', blogRoutes); // Registered blog routes
 app.use('/', followRoutes); // Follow routes
+app.use('/', likeRoutes); // Like routes
 
 // Start server
 app.listen(PORT, () => {

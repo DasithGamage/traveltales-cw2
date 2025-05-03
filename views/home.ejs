@@ -47,6 +47,15 @@
           </form>
         <% } %>
       <% } %>
+
+      <!-- Like/Dislike Feature -->
+      <p>👍 Likes: <%= blog.likes %> | 👎 Dislikes: <%= blog.dislikes %></p>
+      <form action="/like/<%= blog.id %>" method="POST" style="display:inline;">
+        <button type="submit">👍 Like</button>
+      </form>
+      <form action="/dislike/<%= blog.id %>" method="POST" style="display:inline;">
+        <button type="submit">👎 Dislike</button>
+      </form>
     </div>
   <% }) %>
 <% } %>

@@ -1,5 +1,6 @@
 const blogModel = require('../models/blogModel');
 const followModel = require('../models/followModel'); // Import followModel
+const likeModel = require('../models/likeModel');
 
 const blogController = {
   showCreateForm: (req, res) => {
@@ -32,8 +33,8 @@ const blogController = {
       if (req.session.user) {
         const userId = req.session.user.id;
 
-        // Add isFollowing property for each blog author
         for (const blog of blogs) {
+          // isOwnPost / isFollowing
           if (blog.user_id === userId) {
             blog.isOwnPost = true;
           } else {
@@ -44,9 +45,25 @@ const blogController = {
               });
             });
           }
+
+          // Like count
+          await new Promise((resolve) => {
+            likeModel.countReactions(blog.id, 'like', (err, result) => {
+              blog.likes = result?.count || 0;
+              resolve();
+            });
+          });
+
+          // Dislike count
+          await new Promise((resolve) => {
+            likeModel.countReactions(blog.id, 'dislike', (err, result) => {
+              blog.dislikes = result?.count || 0;
+              resolve();
+            });
+          });
         }
 
-        // Get follower and following count
+        // Follower/following count
         followModel.getFollowerCount(userId, (err1, followerResult) => {
           if (err1) return res.send('Error fetching follower count');
 
@@ -60,6 +77,7 @@ const blogController = {
             });
           });
         });
+
       } else {
         res.render('home', { blogs });
       }
