@@ -38,7 +38,7 @@ const blogModel = {
     db.run(query, [id], callback);
   },
 
-  // New: Check if follower is following the blog's author
+  // Check if follower is following the blog's author
   isFollowing: (followerId, followingId, callback) => {
     const query = `
       SELECT * FROM follows
@@ -48,6 +48,19 @@ const blogModel = {
       if (err) return callback(err);
       callback(null, !!row); // true if following
     });
+  },
+
+  // Search blogs by author username or country
+  searchByAuthorOrCountry: (query, callback) => {
+    const sql = `
+      SELECT blogs.*, users.name AS author
+      FROM blogs
+      JOIN users ON blogs.user_id = users.id
+      WHERE LOWER(users.name) LIKE ? OR LOWER(blogs.country) LIKE ?
+      ORDER BY blogs.created_at DESC
+    `;
+    const values = [`%${query.toLowerCase()}%`, `%${query.toLowerCase()}%`];
+    db.all(sql, values, callback);
   }
 };
 

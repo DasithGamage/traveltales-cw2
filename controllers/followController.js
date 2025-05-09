@@ -3,9 +3,10 @@ const userModel = require('../models/userModel');
 
 const followController = {
   follow: (req, res) => {
-    const followerId = req.session.user.id;
+    const followerId = req.session.user?.id;
     const followingId = parseInt(req.params.id);
 
+    if (!followerId) return res.status(401).send('Unauthorized: Please log in.');
     if (followerId === followingId) return res.send('You cannot follow yourself.');
 
     followModel.followUser(followerId, followingId, (err) => {
@@ -18,8 +19,10 @@ const followController = {
   },
 
   unfollow: (req, res) => {
-    const followerId = req.session.user.id;
+    const followerId = req.session.user?.id;
     const followingId = parseInt(req.params.id);
+
+    if (!followerId) return res.status(401).send('Unauthorized: Please log in.');
 
     followModel.unfollowUser(followerId, followingId, (err) => {
       if (err) {
@@ -30,9 +33,13 @@ const followController = {
     });
   },
 
-  // New: Load users excluding current user, and check follow status
+  // Search users and show follow/unfollow status
   searchUsers: (req, res) => {
-    const currentUserId = req.session.user.id;
+    const currentUserId = req.session.user?.id;
+
+    if (!currentUserId) {
+      return res.status(401).send('Unauthorized: Please log in to search users.');
+    }
 
     userModel.getAllExcept(currentUserId, async (err, users) => {
       if (err) return res.send('Error loading users.');

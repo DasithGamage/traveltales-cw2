@@ -14,12 +14,80 @@
   <p>Please <a href="/login">log in</a> or <a href="/register">register</a> to get started.</p>
 <% } %>
 
+<!-- 🔥 Most Liked Posts -->
+<% if (popularPosts && popularPosts.length > 0) { %>
+  <h3>🔥 Most Liked Posts</h3>
+  <% popularPosts.forEach(post => { %>
+    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background-color: #fff5f0;">
+      <h4><%= post.title %></h4>
+      <p><em>By <%= post.author %> on <%= post.created_at.split('T')[0] %></em></p>
+      <% if (post.country) { %>
+        <p><strong>Country:</strong> <%= post.country %>
+        <% if (post.countryInfo?.flag) { %> | <strong>Flag:</strong> <%= post.countryInfo.flag %><% } %>
+        </p>
+      <% } %>
+      <p><%= post.content.slice(0, 150) %>...</p>
+      <a href="/blog/<%= post.id %>">Read more →</a>
+    </div>
+  <% }) %>
+<% } %>
+
+<!-- 🆕 Recent Posts -->
+<% if (recentPosts && recentPosts.length > 0) { %>
+  <h3>🆕 Recent Posts</h3>
+  <% recentPosts.forEach(post => { %>
+    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background-color: #f0faff;">
+      <h4><%= post.title %></h4>
+      <p><em>By <%= post.author %> on <%= post.created_at.split('T')[0] %></em></p>
+      <% if (post.country) { %>
+        <p><strong>Country:</strong> <%= post.country %>
+        <% if (post.countryInfo?.flag) { %> | <strong>Flag:</strong> <%= post.countryInfo.flag %><% } %>
+        </p>
+      <% } %>
+      <p><%= post.content.slice(0, 150) %>...</p>
+      <a href="/blog/<%= post.id %>">Read more →</a>
+    </div>
+  <% }) %>
+<% } %>
+
+<!-- Search and Sort Form -->
+<form action="/search" method="GET" style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
+  <input type="text" name="query" placeholder="Search by author or country" value="<%= query || '' %>" style="padding: 6px; width: 250px;" required>
+  <select name="sort" style="padding: 6px;">
+    <option value="date" <%= sort === 'date' ? 'selected' : '' %>>Sort by Date</option>
+    <option value="likes" <%= sort === 'likes' ? 'selected' : '' %>>Sort by Likes</option>
+  </select>
+  <button type="submit" style="padding: 6px 12px;">Search</button>
+</form>
+
 <hr>
+
+<!-- Matching Users -->
+<% if (matchedUsers && matchedUsers.length > 0) { %>
+  <h3>Matching Profiles</h3>
+  <% matchedUsers.forEach(user => { %>
+    <div style="margin-bottom: 10px; border: 1px dashed #888; padding: 10px;">
+      <strong><%= user.name %></strong>
+      <% if (session.user && session.user.id !== user.id) { %>
+        <% const isFollowingUser = blogs.find(b => b.user_id === user.id)?.isFollowing; %>
+        <% if (isFollowingUser) { %>
+          <form action="/unfollow/<%= user.id %>" method="POST" style="display:inline;">
+            <button type="submit">Unfollow</button>
+          </form>
+        <% } else { %>
+          <form action="/follow/<%= user.id %>" method="POST" style="display:inline;">
+            <button type="submit">Follow</button>
+          </form>
+        <% } %>
+      <% } %>
+    </div>
+  <% }) %>
+<% } %>
 
 <h3>Recent Blog Posts</h3>
 
 <% if (!blogs || blogs.length === 0) { %>
-  <p>No blog posts yet.</p>
+  <p>No blog posts found.</p>
 <% } else { %>
   <% blogs.forEach(blog => { %>
     <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
@@ -27,6 +95,15 @@
       <p><em>By <%= blog.author %> on <%= blog.created_at.split('T')[0] %></em></p>
       <% if (blog.country) { %><p>Country: <%= blog.country %></p><% } %>
       <% if (blog.visit_date) { %><p>Visited on: <%= blog.visit_date %></p><% } %>
+
+      <% if (blog.countryInfo) { %>
+        <p>
+          🌍 <strong>Capital:</strong> <%= blog.countryInfo.capital %> |
+          <strong>Currency:</strong> <%= blog.countryInfo.currency %> |
+          <strong>Flag:</strong> <%= blog.countryInfo.flag %>
+        </p>
+      <% } %>
+
       <p><%= blog.content %></p>
 
       <% if (session.user && session.user.id === blog.user_id) { %>
@@ -48,7 +125,6 @@
         <% } %>
       <% } %>
 
-      <!-- Like/Dislike Feature -->
       <p>👍 Likes: <%= blog.likes %> | 👎 Dislikes: <%= blog.dislikes %></p>
       <form action="/like/<%= blog.id %>" method="POST" style="display:inline;">
         <button type="submit">👍 Like</button>
@@ -58,4 +134,15 @@
       </form>
     </div>
   <% }) %>
+
+  <!-- Pagination -->
+  <div style="margin-top: 20px;">
+    <% if (page && page > 1) { %>
+      <a href="?query=<%= query %>&sort=<%= sort %>&page=<%= prevPage %>">⬅ Prev</a>
+    <% } %>
+    <span style="margin: 0 10px;">Page <%= page || 1 %></span>
+    <% if (blogs.length === limit) { %>
+      <a href="?query=<%= query %>&sort=<%= sort %>&page=<%= nextPage %>">Next ➡</a>
+    <% } %>
+  </div>
 <% } %>

@@ -28,14 +28,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Home route
-//app.get('/', (req, res) => {
-//  res.render('home'); // Make sure you have views/home.ejs
-//});
-
 // Route handling
 app.use('/', authRoutes);
-app.use('/', blogRoutes); // Registered blog routes
+app.use('/', blogRoutes); // Registered blog routes and Search routes
 app.use('/', followRoutes); // Follow routes
 app.use('/', likeRoutes); // Like routes
 

@@ -16,4 +16,7 @@ router.get('/blog/edit/:id', blogController.showEditForm);
 router.post('/blog/edit/:id', blogController.updateBlogPost);
 router.get('/blog/delete/:id', blogController.deleteBlogPost);
 
+// Search blogs by country or username
+router.get('/search', blogController.searchBlogs);
+
 module.exports = router;
