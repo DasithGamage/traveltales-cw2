@@ -1,0 +1,6 @@
+# Ignore node dependencies and generated files
+node_modules/
+.env
+*.db
+fetchTest.js
+.DS_Store
