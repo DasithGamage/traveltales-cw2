@@ -24,7 +24,7 @@
     <div class="country-info-grid">
       <div class="info-card flag-card">
         <p><strong>🚩 Flag</strong></p>
-        <p class="info-value" id="countryFlag"></p>
+        <p class="info-value" id="countryFlag" style="font-size: 3em;"></p>
       </div>
       <div class="info-card capital-card">
         <p><strong>🏛️ Capital</strong></p>
@@ -40,7 +40,7 @@
 
 <script>
 // Fetch all countries for the dropdown
-fetch('https://restcountries.com/v3.1/all')
+fetch('https://restcountries.com/v3.1/all?fields=name,capital,currencies,flags,flag')
   .then(response => response.json())
   .then(countries => {
     const dropdown = document.getElementById('countryDropdown');
@@ -50,6 +50,7 @@ fetch('https://restcountries.com/v3.1/all')
       option.value = country.name.common;
       option.textContent = country.name.common;
       option.dataset.flag = country.flag || '';
+      option.dataset.flagPng = country.flags?.png || '';
       option.dataset.capital = country.capital?.[0] || 'N/A';
       option.dataset.currency = Object.keys(country.currencies || {})[0] || 'N/A';
       dropdown.appendChild(option);
@@ -85,7 +86,7 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
             <p class="meta">By <%= post.author %> on <%= post.created_at.split('T')[0] %></p>
             <% if (post.country) { %>
               <p class="country-info-text"><strong>Country:</strong> <%= post.country %>
-              <% if (post.countryInfo?.flag) { %> | <img src="<%= post.countryInfo.flag %>" alt="Flag" style="height: 16px; width: auto; vertical-align: middle;"><% } %>
+              <% if (post.countryInfo?.flag) { %> <%= post.countryInfo.flag %><% } %>
               </p>
             <% } %>
             <div class="content-preview">
@@ -109,7 +110,7 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
             <p class="meta">By <%= post.author %> on <%= post.created_at.split('T')[0] %></p>
             <% if (post.country) { %>
               <p class="country-info-text"><strong>Country:</strong> <%= post.country %>
-              <% if (post.countryInfo?.flag) { %> | <img src="<%= post.countryInfo.flag %>" alt="Flag" style="height: 16px; width: auto; vertical-align: middle;"><% } %>
+              <% if (post.countryInfo?.flag) { %> <%= post.countryInfo.flag %><% } %>
               </p>
             <% } %>
             <div class="content-preview">
@@ -159,7 +160,7 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
             <strong>🏛️ Capital:</strong> <%= blog.countryInfo.capital %> |
             <strong>💰 Currency:</strong> <%= blog.countryInfo.currency %>
             <% if (blog.countryInfo.flag) { %> | 
-              <strong>Flag:</strong> <img src="<%= blog.countryInfo.flag %>" alt="Flag" style="height: 20px; width: auto; vertical-align: middle;">
+              <strong>Flag:</strong> <%= blog.countryInfo.flag %>
             <% } %>
           </p>
         <% } %>

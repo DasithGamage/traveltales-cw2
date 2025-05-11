@@ -11,8 +11,30 @@ const getRecentPosts = () => {
        FROM blogs 
        JOIN users ON blogs.user_id = users.id 
        ORDER BY blogs.created_at DESC 
-       LIMIT 3`, [], (err, rows) => {
+       LIMIT 3`, [], async (err, rows) => {
         if (err) return resolve([]);
+        
+        // Get country info for recent posts
+        for (const post of rows) {
+          if (post.country) {
+            try {
+              const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(post.country)}?fields=name,capital,currencies,flags,flag`);
+              const data = await resp.json();
+              
+              if (Array.isArray(data) && data.length > 0) {
+                const country = data[0];
+                post.countryInfo = {
+                  flag: country.flag || '',
+                  capital: country.capital?.[0] || 'N/A',
+                  currency: Object.keys(country.currencies || {})[0] || 'N/A'
+                };
+              }
+            } catch (err) {
+              console.error('Country fetch error for recent posts:', err);
+            }
+          }
+        }
+        
         resolve(rows);
       }
     );
@@ -28,8 +50,30 @@ const getPopularPosts = () => {
        LEFT JOIN likes ON blogs.id = likes.blog_id AND likes.type = 'like'
        GROUP BY blogs.id
        ORDER BY COUNT(likes.id) DESC
-       LIMIT 3`, [], (err, rows) => {
+       LIMIT 3`, [], async (err, rows) => {
         if (err) return resolve([]);
+        
+        // Get country info for popular posts
+        for (const post of rows) {
+          if (post.country) {
+            try {
+              const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(post.country)}?fields=name,capital,currencies,flags,flag`);
+              const data = await resp.json();
+              
+              if (Array.isArray(data) && data.length > 0) {
+                const country = data[0];
+                post.countryInfo = {
+                  flag: country.flag || '',
+                  capital: country.capital?.[0] || 'N/A',
+                  currency: Object.keys(country.currencies || {})[0] || 'N/A'
+                };
+              }
+            } catch (err) {
+              console.error('Country fetch error for popular posts:', err);
+            }
+          }
+        }
+        
         resolve(rows);
       }
     );
@@ -86,7 +130,7 @@ const blogController = {
         // Get country info
         if (blog.country) {
           try {
-            const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(blog.country)}?fullText=true`);
+            const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(blog.country)}?fields=name,capital,currencies,flags,flag`);
             const data = await resp.json();
             
             // Check if data is an array with at least one country
@@ -185,7 +229,7 @@ const blogController = {
 
           if (blog.country && !countryCache[blog.country.toLowerCase()]) {
             try {
-              const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(blog.country)}?fullText=true`);
+              const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(blog.country)}?fields=name,capital,currencies,flags,flag`);
               const data = await resp.json();
               
               // Check if data is an array with at least one country
@@ -428,7 +472,7 @@ const blogController = {
 
         if (blog.country && !countryCache[blog.country.toLowerCase()]) {
           try {
-            const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(blog.country)}?fullText=true`);
+            const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(blog.country)}?fields=name,capital,currencies,flags,flag`);
             const data = await resp.json();
             
             // Check if data is an array with at least one country
