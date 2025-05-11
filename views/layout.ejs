@@ -16,6 +16,7 @@
           <span style="margin-right: 20px;">Welcome, <%= session.user.name %></span>
           <a href="/">Home</a>
           <a href="/blog/create">Create Post</a>
+          <a href="/profile">Profile</a>
           <a href="/logout">Logout</a>
         <% } else { %>
           <a href="/">Home</a>
@@ -26,5 +27,92 @@
     </div>
   </nav>
   <div class="container">
+
+<script>
+function confirmDelete(message = 'Are you sure?') {
+  return new Promise((resolve) => {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    `;
+    
+    // Create dialog box
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+      background-color: #3a3a3a;
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    `;
+    
+    dialog.innerHTML = `
+      <h3 style="margin: 0 0 10px 0;">localhost:3000 says</h3>
+      <p style="margin: 0 0 20px 0;">${message}</p>
+      <div>
+        <button id="confirmBtn" style="
+          background-color: #f8b4b4;
+          color: #333;
+          border: none;
+          padding: 10px 30px;
+          margin: 0 10px;
+          border-radius: 20px;
+          cursor: pointer;
+          font-weight: bold;
+        ">OK</button>
+        <button id="cancelBtn" style="
+          background-color: #a85858;
+          color: white;
+          border: none;
+          padding: 10px 25px;
+          margin: 0 10px;
+          border-radius: 20px;
+          cursor: pointer;
+          font-weight: bold;
+        ">Cancel</button>
+      </div>
+    `;
+    
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+    
+    // Handle button clicks
+    document.getElementById('confirmBtn').onclick = () => {
+      document.body.removeChild(overlay);
+      resolve(true);
+    };
+    
+    document.getElementById('cancelBtn').onclick = () => {
+      document.body.removeChild(overlay);
+      resolve(false);
+    };
+  });
+}
+
+// Replace the default confirm for delete links
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('a[href*="/delete"]').forEach(link => {
+    link.onclick = async function(e) {
+      e.preventDefault();
+      const confirmed = await confirmDelete('Are you sure?');
+      if (confirmed) {
+        window.location.href = this.href;
+      }
+    };
+  });
+});
+</script>
 </body>
 </html>

@@ -1,15 +1,42 @@
 <%- include('layout') %>
 
-<h2>Register</h2>
-<form action="/register" method="POST">
-  <label>Name:</label>
-  <input type="text" name="name" required><br>
+<div class="form-container">
+  <h2>Register</h2>
+  <form action="/register" method="POST">
+    <div class="form-group">
+      <label>Name:</label>
+      <input type="text" name="name" required>
+    </div>
 
-  <label>Email:</label>
-  <input type="email" name="email" required><br>
+    <div class="form-group">
+      <label>Email:</label>
+      <input type="email" name="email" required>
+    </div>
 
-  <label>Password:</label>
-  <input type="password" name="password" required><br>
+    <div class="form-group">
+      <label>Password:</label>
+      <input type="password" name="password" required>
+    </div>
+    
+    <h3>Security Questions (for password recovery)</h3>
+    
+    <div class="form-group">
+      <label>What is your mother's first name?</label>
+      <input type="text" name="answer1" required>
+    </div>
+    
+    <div class="form-group">
+      <label>What was the name of your first school?</label>
+      <input type="text" name="answer2" required>
+    </div>
+    
+    <div class="form-group">
+      <label>What city were you born in?</label>
+      <input type="text" name="answer3" required>
+    </div>
 
-  <button type="submit">Register</button>
-</form>
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
+</div>
+
+</div>

@@ -1,0 +1,28 @@
+<%- include('layout') %>
+
+<div class="form-container">
+  <h2>Answer Security Questions</h2>
+  
+  <form action="/reset-password" method="POST">
+    <input type="hidden" name="email" value="<%= email %>">
+    
+    <div class="form-group">
+      <label>What is your mother's first name?</label>
+      <input type="text" name="answer1" required>
+    </div>
+    
+    <div class="form-group">
+      <label>What was the name of your first school?</label>
+      <input type="text" name="answer2" required>
+    </div>
+    
+    <div class="form-group">
+      <label>What city were you born in?</label>
+      <input type="text" name="answer3" required>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Verify Answers</button>
+  </form>
+</div>
+
+</div>

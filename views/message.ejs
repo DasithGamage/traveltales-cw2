@@ -1,0 +1,30 @@
+<%- include('layout') %>
+
+<div class="message-container">
+  <div class="message-box <%= type %>">
+    <% if (type === 'success') { %>
+      <div class="message-icon">✓</div>
+    <% } else if (type === 'error') { %>
+      <div class="message-icon">✕</div>
+    <% } else if (type === 'info') { %>
+      <div class="message-icon">i</div>
+    <% } %>
+    
+    <div class="message-content">
+      <h3><%= type === 'success' ? 'Success!' : type === 'error' ? 'Error' : 'Information' %></h3>
+      <p><%= message %></p>
+    </div>
+    
+    <% if (redirectUrl) { %>
+      <div class="message-actions">
+        <a href="<%= redirectUrl %>" class="btn btn-primary">Continue</a>
+      </div>
+    <% } else { %>
+      <div class="message-actions">
+        <a href="javascript:history.back()" class="btn btn-primary">Go Back</a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+</div>

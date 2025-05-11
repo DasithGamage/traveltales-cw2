@@ -15,7 +15,9 @@ module.exports = {
   // Create new user
   createUser: (name, email, hashedPassword, callback) => {
     const sql = `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`;
-    db.run(sql, [name, email, hashedPassword], callback);
+    db.run(sql, [name, email, hashedPassword], function(err) {
+      callback(err, this);
+    });
   },
 
   // Find user by email
@@ -40,5 +42,37 @@ module.exports = {
   getAllExcept: (currentUserId, callback) => {
     const sql = `SELECT * FROM users WHERE id != ?`;
     db.all(sql, [currentUserId], callback);
+  },
+  
+  // New methods for profile management and password reset
+  saveSecurityQuestions: (userId, answer1, answer2, answer3, callback) => {
+    const sql = `INSERT INTO security_questions (user_id, question1, answer1, question2, answer2, question3, answer3) 
+                 VALUES (?, 'mothers maiden name', ?, 'first pet name', ?, 'birth city', ?)`;
+    db.run(sql, [userId, answer1, answer2, answer3], callback);
+  },
+  
+  verifySecurityAnswers: (email, answer1, answer2, answer3, callback) => {
+    const sql = `SELECT sq.* FROM security_questions sq 
+                 JOIN users u ON sq.user_id = u.id 
+                 WHERE u.email = ?`;
+    db.get(sql, [email], (err, row) => {
+      if (err) return callback(err);
+      if (!row) return callback(null, false);
+      
+      const isValid = row.answer1 === answer1 && 
+                      row.answer2 === answer2 && 
+                      row.answer3 === answer3;
+      callback(null, isValid);
+    });
+  },
+  
+  updatePassword: (email, newPassword, callback) => {
+    const sql = `UPDATE users SET password = ? WHERE email = ?`;
+    db.run(sql, [newPassword, email], callback);
+  },
+  
+  updateUser: (userId, name, email, callback) => {
+    const sql = `UPDATE users SET name = ?, email = ? WHERE id = ?`;
+    db.run(sql, [name, email, userId], callback);
   }
 };

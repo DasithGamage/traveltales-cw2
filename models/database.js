@@ -47,4 +47,19 @@ db.run(`
 )
 `);
 
+// Add security questions table
+db.run(`
+  CREATE TABLE IF NOT EXISTS security_questions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    question1 TEXT NOT NULL,
+    answer1 TEXT NOT NULL,
+    question2 TEXT NOT NULL,
+    answer2 TEXT NOT NULL,
+    question3 TEXT NOT NULL,
+    answer3 TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )
+`);
+
 module.exports = db;
