@@ -1,29 +1,40 @@
 <%- include('layout') %>
 
-<h2>Welcome to TravelTales!</h2>
-
-<% if (session && session.user) { %>
-  <p>You are logged in as <strong><%= session.user.name %></strong></p>
-  <p><a href="/blog/create">Create a new blog post</a></p>
-
-  <% if (typeof followerCount !== 'undefined' && typeof followingCount !== 'undefined') { %>
-    <p><strong>Followers:</strong> <%= followerCount %></p>
-    <p><strong>Following:</strong> <%= followingCount %></p>
+<div class="welcome-section">
+  <h2>Welcome to TravelTales!</h2>
+  
+  <% if (session && session.user) { %>
+    <p>You are logged in as <strong><%= session.user.name %></strong></p>
+    <% if (typeof followerCount !== 'undefined' && typeof followingCount !== 'undefined') { %>
+      <p><strong>Followers:</strong> <%= followerCount %> | <strong>Following:</strong> <%= followingCount %></p>
+    <% } %>
+  <% } else { %>
+    <p>Share your travel experiences and explore stories from around the world!</p>
   <% } %>
-<% } else { %>
-  <p>Please <a href="/login">log in</a> or <a href="/register">register</a> to get started.</p>
-<% } %>
+</div>
 
-<!-- Country Information Dropdown (Requirement 8.1) -->
-<div style="background-color: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 5px;">
+<!-- Country Information Dropdown -->
+<div class="country-info">
   <h3>Explore Countries</h3>
-  <select id="countryDropdown" style="padding: 8px; width: 300px;">
+  <select id="countryDropdown">
     <option value="">Select a country to view information...</option>
   </select>
-  <div id="countryInfo" style="margin-top: 15px; display: none;">
-    <p><strong>Flag:</strong> <span id="countryFlag"></span></p>
-    <p><strong>Capital:</strong> <span id="countryCapital"></span></p>
-    <p><strong>Currency:</strong> <span id="countryCurrency"></span></p>
+  <div id="countryInfo" class="country-data" style="display: none;">
+    <h4 id="selectedCountryName" style="color: #2c3e50; margin-bottom: 15px; font-size: 1.5em; text-align: center;"></h4>
+    <div class="country-info-grid">
+      <div class="info-card flag-card">
+        <p><strong>🚩 Flag</strong></p>
+        <p class="info-value" id="countryFlag"></p>
+      </div>
+      <div class="info-card capital-card">
+        <p><strong>🏛️ Capital</strong></p>
+        <p class="info-value" id="countryCapital"></p>
+      </div>
+      <div class="info-card currency-card">
+        <p><strong>💰 Currency</strong></p>
+        <p class="info-value" id="countryCurrency"></p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -51,6 +62,7 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
   const infoDiv = document.getElementById('countryInfo');
   
   if (selectedOption.value) {
+    document.getElementById('selectedCountryName').textContent = selectedOption.value;
     document.getElementById('countryFlag').textContent = selectedOption.dataset.flag;
     document.getElementById('countryCapital').textContent = selectedOption.dataset.capital;
     document.getElementById('countryCurrency').textContent = selectedOption.dataset.currency;
@@ -61,123 +73,143 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
 });
 </script>
 
-<!-- Only show these sections when NOT searching -->
-<% if (!query) { %>
+<div class="posts-grid">
   <!-- 🔥 Most Liked Posts -->
-  <% if (popularPosts && popularPosts.length > 0) { %>
+  <div class="posts-section">
     <h3>🔥 Most Liked Posts</h3>
-    <% popularPosts.forEach(post => { %>
-      <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background-color: #fff5f0;">
-        <h4><%= post.title %></h4>
-        <p><em>By <%= post.author %> on <%= post.created_at.split('T')[0] %></em></p>
-        <% if (post.country) { %>
-          <p><strong>Country:</strong> <%= post.country %>
-          <% if (post.countryInfo?.flag) { %> | <strong>Flag:</strong> <%= post.countryInfo.flag %><% } %>
-          </p>
-        <% } %>
-        <p><%= post.content.slice(0, 150) %>...</p>
-        <a href="/blog/<%= post.id %>">Read more →</a>
-      </div>
-    <% }) %>
-  <% } %>
+    <div class="post-cards-container">
+      <% if (popularPosts && popularPosts.length > 0) { %>
+        <% popularPosts.forEach(post => { %>
+          <div class="post-card popular-post">
+            <h4><%= post.title %></h4>
+            <p class="meta">By <%= post.author %> on <%= post.created_at.split('T')[0] %></p>
+            <% if (post.country) { %>
+              <p class="country-info-text"><strong>Country:</strong> <%= post.country %>
+              <% if (post.countryInfo?.flag) { %> | <img src="<%= post.countryInfo.flag %>" alt="Flag" style="height: 16px; width: auto; vertical-align: middle;"><% } %>
+              </p>
+            <% } %>
+            <div class="content-preview">
+              <p><%= post.content.slice(0, 150) %>...</p>
+            </div>
+            <a href="/blog/<%= post.id %>" class="read-more-btn">Read more →</a>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
 
   <!-- 🆕 Recent Posts -->
-  <% if (recentPosts && recentPosts.length > 0) { %>
+  <div class="posts-section">
     <h3>🆕 Recent Posts</h3>
-    <% recentPosts.forEach(post => { %>
-      <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background-color: #f0faff;">
-        <h4><%= post.title %></h4>
-        <p><em>By <%= post.author %> on <%= post.created_at.split('T')[0] %></em></p>
-        <% if (post.country) { %>
-          <p><strong>Country:</strong> <%= post.country %>
-          <% if (post.countryInfo?.flag) { %> | <strong>Flag:</strong> <%= post.countryInfo.flag %><% } %>
-          </p>
-        <% } %>
-        <p><%= post.content.slice(0, 150) %>...</p>
-        <a href="/blog/<%= post.id %>">Read more →</a>
-      </div>
-    <% }) %>
-  <% } %>
-<% } %>
-
-<!-- Search Blog Posts with Type Selection -->
-<form action="/search" method="GET" style="margin-top: 30px; background-color: #e9ecef; padding: 15px; border-radius: 5px;">
-  <h3>Search Blog Posts</h3>
-  <div style="display: flex; gap: 10px; align-items: center;">
-    <select name="searchType" style="padding: 8px;">
-      <option value="country" <%= searchType === 'country' ? 'selected' : '' %>>Search by Country</option>
-      <option value="author" <%= searchType === 'author' ? 'selected' : '' %>>Search by Author</option>
-    </select>
-    <input type="text" name="query" placeholder="Enter search term" value="<%= query || '' %>" style="padding: 8px; width: 300px;" required>
-    <button type="submit" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px;">Search</button>
+    <div class="post-cards-container">
+      <% if (recentPosts && recentPosts.length > 0) { %>
+        <% recentPosts.forEach(post => { %>
+          <div class="post-card recent-post">
+            <h4><%= post.title %></h4>
+            <p class="meta">By <%= post.author %> on <%= post.created_at.split('T')[0] %></p>
+            <% if (post.country) { %>
+              <p class="country-info-text"><strong>Country:</strong> <%= post.country %>
+              <% if (post.countryInfo?.flag) { %> | <img src="<%= post.countryInfo.flag %>" alt="Flag" style="height: 16px; width: auto; vertical-align: middle;"><% } %>
+              </p>
+            <% } %>
+            <div class="content-preview">
+              <p><%= post.content.slice(0, 150) %>...</p>
+            </div>
+            <a href="/blog/<%= post.id %>" class="read-more-btn">Read more →</a>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
   </div>
-</form>
+</div>
 
-<hr>
+<!-- Search Blog Posts -->
+<div class="search-box">
+  <h3>Search Blog Posts</h3>
+  <form action="/search" method="GET" class="search-form">
+    <select name="searchType">
+      <option value="country">Search by Country</option>
+      <option value="author">Search by Author</option>
+    </select>
+    <input type="text" name="query" placeholder="Enter search term" required>
+    <button type="submit">Search</button>
+  </form>
+</div>
 
-<h3><%= query ? `Search Results for "${query}"` : 'Recent Blog Posts' %></h3>
+<hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+
+<h3 style="font-size: 1.5em; margin-bottom: 20px;">All Blog Posts</h3>
 
 <% if (!blogs || blogs.length === 0) { %>
-  <p><%= query ? `No blog posts found matching "${query}".` : 'No blog posts found.' %></p>
+  <p style="text-align: center; padding: 40px; font-size: 1.1em; color: #7f8c8d;">
+    No blog posts found. Be the first to share your travel story!
+  </p>
 <% } else { %>
-  <% if (query) { %>
-    <p>Found <%= blogs.length %> blog post<%= blogs.length > 1 ? 's' : '' %> matching "<%= query %>".</p>
-  <% } %>
-  
   <% blogs.forEach(blog => { %>
-    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+    <div class="blog-post">
       <h4><%= blog.title %></h4>
-      <p><em>By <%= blog.author %> on <%= blog.created_at.split('T')[0] %></em></p>
-      <% if (blog.country) { %><p>Country: <%= blog.country %></p><% } %>
-      <% if (blog.visit_date) { %><p>Visited on: <%= blog.visit_date %></p><% } %>
-
-      <% if (blog.countryInfo) { %>
-        <p>
-          🌍 <strong>Capital:</strong> <%= blog.countryInfo.capital %> |
-          <strong>Currency:</strong> <%= blog.countryInfo.currency %> |
-          <strong>Flag:</strong> <%= blog.countryInfo.flag %>
-        </p>
-      <% } %>
-
-      <p><%= blog.content %></p>
-
-      <% if (session.user && session.user.id === blog.user_id) { %>
-        <p>
-          <a href="/blog/edit/<%= blog.id %>">Edit</a> |
-          <a href="/blog/delete/<%= blog.id %>" onclick="return confirm('Are you sure?')">Delete</a>
-        </p>
-      <% } %>
-
-      <% if (session.user && session.user.id !== blog.user_id) { %>
-        <% if (blog.isFollowing) { %>
-          <form action="/unfollow/<%= blog.user_id %>" method="POST" style="display:inline;">
-            <button type="submit">Unfollow</button>
-          </form>
-        <% } else { %>
-          <form action="/follow/<%= blog.user_id %>" method="POST" style="display:inline;">
-            <button type="submit">Follow</button>
-          </form>
+      <p class="meta">By <%= blog.author %> on <%= blog.created_at.split('T')[0] %></p>
+      
+      <div class="country-details">
+        <% if (blog.country) { %><p><strong>🌍 Country:</strong> <%= blog.country %></p><% } %>
+        <% if (blog.visit_date) { %><p><strong>📅 Visited on:</strong> <%= blog.visit_date %></p><% } %>
+        
+        <% if (blog.countryInfo) { %>
+          <p>
+            <strong>🏛️ Capital:</strong> <%= blog.countryInfo.capital %> |
+            <strong>💰 Currency:</strong> <%= blog.countryInfo.currency %>
+            <% if (blog.countryInfo.flag) { %> | 
+              <strong>Flag:</strong> <img src="<%= blog.countryInfo.flag %>" alt="Flag" style="height: 20px; width: auto; vertical-align: middle;">
+            <% } %>
+          </p>
         <% } %>
-      <% } %>
+      </div>
 
-      <p>👍 Likes: <%= blog.likes %> | 👎 Dislikes: <%= blog.dislikes %></p>
-      <form action="/like/<%= blog.id %>" method="POST" style="display:inline;">
-        <button type="submit">👍 Like</button>
-      </form>
-      <form action="/dislike/<%= blog.id %>" method="POST" style="display:inline;">
-        <button type="submit">👎 Dislike</button>
-      </form>
+      <p class="content"><%= blog.content %></p>
+
+      <div class="blog-actions">
+        <div class="left-actions">
+          <% if (session.user && session.user.id === blog.user_id) { %>
+            <a href="/blog/edit/<%= blog.id %>">Edit</a>
+            <a href="/blog/delete/<%= blog.id %>" onclick="return confirm('Are you sure?')">Delete</a>
+          <% } %>
+          
+          <% if (session.user && session.user.id !== blog.user_id) { %>
+            <% if (blog.isFollowing) { %>
+              <form action="/unfollow/<%= blog.user_id %>" method="POST">
+                <button type="submit" class="follow-btn">Unfollow</button>
+              </form>
+            <% } else { %>
+              <form action="/follow/<%= blog.user_id %>" method="POST">
+                <button type="submit" class="follow-btn">Follow</button>
+              </form>
+            <% } %>
+          <% } %>
+        </div>
+        
+        <div class="right-actions">
+          <span style="margin-right: 15px;">👍 <%= blog.likes %> | 👎 <%= blog.dislikes %></span>
+          <form action="/like/<%= blog.id %>" method="POST">
+            <button type="submit" class="like-btn">👍 Like</button>
+          </form>
+          <form action="/dislike/<%= blog.id %>" method="POST">
+            <button type="submit" class="dislike-btn">👎 Dislike</button>
+          </form>
+        </div>
+      </div>
     </div>
   <% }) %>
 
   <!-- Pagination -->
-  <div style="margin-top: 20px;">
-    <% if (page && page > 1) { %>
-      <a href="?<%= query ? `searchType=${searchType}&query=${query}&` : '' %>page=<%= prevPage %>">⬅ Prev</a>
+  <div class="pagination">
+    <% if (page > 1) { %>
+      <a href="?page=<%= prevPage %>">⬅ Previous</a>
     <% } %>
-    <span style="margin: 0 10px;">Page <%= page || 1 %></span>
+    <span>Page <%= page %></span>
     <% if (blogs.length === limit) { %>
-      <a href="?<%= query ? `searchType=${searchType}&query=${query}&` : '' %>page=<%= nextPage %>">Next ➡</a>
+      <a href="?page=<%= nextPage %>">Next ➡</a>
     <% } %>
   </div>
 <% } %>
+
+</div>

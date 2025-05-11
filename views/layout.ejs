@@ -2,17 +2,29 @@
 <html>
 <head>
   <title>TravelTales</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <nav>
-    <% if (session && session.user) { %>
-      <span>Welcome, <%= session.user.name %></span> |
-      <a href="/logout">Logout</a>
-    <% } else { %>
-      <a href="/login">Login</a> |
-      <a href="/register">Register</a>
-    <% } %>
+    <div class="nav-content">
+      <div class="nav-brand">
+        <a href="/">TravelTales</a>
+      </div>
+      <div class="nav-links">
+        <% if (session && session.user) { %>
+          <span style="margin-right: 20px;">Welcome, <%= session.user.name %></span>
+          <a href="/">Home</a>
+          <a href="/blog/create">Create Post</a>
+          <a href="/logout">Logout</a>
+        <% } else { %>
+          <a href="/">Home</a>
+          <a href="/login">Login</a>
+          <a href="/register">Register</a>
+        <% } %>
+      </div>
+    </div>
   </nav>
-  <hr>
+  <div class="container">
 </body>
 </html>

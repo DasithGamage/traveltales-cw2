@@ -1,19 +1,31 @@
 <%- include('layout') %>
 
-<h2>Create a Travel Blog Post</h2>
+<div class="form-container">
+  <h2>Create a Travel Blog Post</h2>
 
-<form action="/blog/create" method="POST">
-  <label for="title">Title:</label><br>
-  <input type="text" id="title" name="title" required><br><br>
+  <form action="/blog/create" method="POST">
+    <div class="form-group">
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" required placeholder="Enter your blog post title">
+    </div>
 
-  <label for="content">Content:</label><br>
-  <textarea id="content" name="content" rows="6" cols="50" required></textarea><br><br>
+    <div class="form-group">
+      <label for="content">Content:</label>
+      <textarea id="content" name="content" required placeholder="Share your travel experience..."></textarea>
+    </div>
 
-  <label for="country">Country:</label><br>
-  <input type="text" id="country" name="country" required><br><br>
+    <div class="form-group">
+      <label for="country">Country:</label>
+      <input type="text" id="country" name="country" required placeholder="Which country did you visit?">
+    </div>
 
-  <label for="visit_date">Visit Date:</label><br>
-  <input type="date" id="visit_date" name="visit_date" required><br><br>
+    <div class="form-group">
+      <label for="visit_date">Visit Date:</label>
+      <input type="date" id="visit_date" name="visit_date" required>
+    </div>
 
-  <button type="submit">Post Blog</button>
-</form>
+    <button type="submit" class="btn btn-primary">Post Blog</button>
+  </form>
+</div>
+
+</div>

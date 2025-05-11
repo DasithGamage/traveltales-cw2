@@ -5,6 +5,9 @@ const blogController = require('../controllers/blogController');
 // Show all blog posts on home page
 router.get('/', blogController.showAllBlogs);
 
+// Show single blog post
+router.get('/blog/:id', blogController.showSingleBlog);
+
 // Show the create blog form
 router.get('/blog/create', blogController.showCreateForm);
 

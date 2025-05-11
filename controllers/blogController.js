@@ -48,16 +48,89 @@ const blogController = {
 
     //  All 4 fields are required
     if (!title || !content || !country || !visit_date) {
-      return res.send('All fields (title, content, country, visit date) are required.');
+      return res.status(400).render('error', { 
+        message: 'All fields (title, content, country, visit date) are required.',
+        returnUrl: '/blog/create'
+      });
     }
 
     blogModel.createBlog(userId, title, content, country, visit_date, (err) => {
       if (err) {
         console.error(err);
-        return res.send('Error saving blog post.');
+        return res.status(500).render('error', { 
+          message: 'Error saving blog post. Please try again.',
+          returnUrl: '/blog/create'
+        });
       }
       res.redirect('/');
     });
+  },
+
+  showSingleBlog: (req, res) => {
+    const blogId = req.params.id;
+    
+    db.get(
+      `SELECT blogs.*, users.name AS author
+       FROM blogs
+       JOIN users ON blogs.user_id = users.id
+       WHERE blogs.id = ?`,
+      [blogId],
+      async (err, blog) => {
+        if (err || !blog) {
+          return res.status(404).render('error', {
+            message: 'Blog post not found.',
+            returnUrl: '/'
+          });
+        }
+
+        // Get country info
+        if (blog.country) {
+          try {
+            const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(blog.country)}?fullText=true`);
+            const data = await resp.json();
+            
+            // Check if data is an array with at least one country
+            if (Array.isArray(data) && data.length > 0) {
+              const country = data[0];
+              blog.countryInfo = {
+                flag: country.flag || '',
+                capital: country.capital?.[0] || 'N/A',
+                currency: Object.keys(country.currencies || {})[0] || 'N/A'
+              };
+            }
+          } catch (err) {
+            console.error('Country fetch error for:', blog.country);
+          }
+        }
+
+        // Get likes/dislikes
+        await new Promise(resolve => {
+          likeModel.countReactions(blog.id, 'like', (err, result) => {
+            blog.likes = result?.count || 0;
+            resolve();
+          });
+        });
+
+        await new Promise(resolve => {
+          likeModel.countReactions(blog.id, 'dislike', (err, result) => {
+            blog.dislikes = result?.count || 0;
+            resolve();
+          });
+        });
+
+        // Check if user is following
+        if (req.session.user) {
+          await new Promise(resolve => {
+            blogModel.isFollowing(req.session.user.id, blog.user_id, (err, isFollowing) => {
+              blog.isFollowing = isFollowing;
+              resolve();
+            });
+          });
+        }
+
+        res.render('single-blog', { blog });
+      }
+    );
   },
 
   showAllBlogs: async (req, res) => {
@@ -75,7 +148,10 @@ const blogController = {
       async (err, blogs) => {
         if (err) {
           console.error(err);
-          return res.send('Error loading blog posts.');
+          return res.status(500).render('error', { 
+            message: 'Error loading blog posts. Please try again.',
+            returnUrl: '/'
+          });
         }
 
         const userId = req.session.user?.id;
@@ -111,14 +187,21 @@ const blogController = {
             try {
               const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(blog.country)}?fullText=true`);
               const data = await resp.json();
-              const country = data[0];
-              countryCache[blog.country.toLowerCase()] = {
-                flag: country.flag || '',
-                capital: country.capital?.[0] || 'N/A',
-                currency: Object.keys(country.currencies || {})[0] || 'N/A'
-              };
+              
+              // Check if data is an array with at least one country
+              if (Array.isArray(data) && data.length > 0) {
+                const country = data[0];
+                countryCache[blog.country.toLowerCase()] = {
+                  flag: country.flag || '',
+                  capital: country.capital?.[0] || 'N/A',
+                  currency: Object.keys(country.currencies || {})[0] || 'N/A'
+                };
+              } else {
+                // If no country found, set null
+                countryCache[blog.country.toLowerCase()] = null;
+              }
             } catch (err) {
-              console.error('Country fetch error:', err);
+              console.error('Country fetch error for:', blog.country);
               countryCache[blog.country.toLowerCase()] = null;
             }
           }
@@ -159,9 +242,29 @@ const blogController = {
 
   showEditForm: (req, res) => {
     const blogId = req.params.id;
+    
+    if (!req.session.user) {
+      return res.status(401).render('error', { 
+        message: 'Please log in to edit blog posts.',
+        returnUrl: '/login'
+      });
+    }
+    
     blogModel.getBlogById(blogId, (err, blog) => {
-      if (err || !blog) return res.send('Blog not found.');
-      if (blog.user_id !== req.session.user.id) return res.send('Unauthorized.');
+      if (err || !blog) {
+        return res.status(404).render('error', { 
+          message: 'Blog post not found.',
+          returnUrl: '/'
+        });
+      }
+      
+      if (blog.user_id !== req.session.user.id) {
+        return res.status(403).render('error', { 
+          message: 'You are not authorized to edit this blog post.',
+          returnUrl: '/'
+        });
+      }
+      
       res.render('edit', { blog });
     });
   },
@@ -169,30 +272,74 @@ const blogController = {
   updateBlogPost: (req, res) => {
     const blogId = req.params.id;
     const { title, content, country, visit_date } = req.body;
+    
+    if (!req.session.user) {
+      return res.status(401).render('error', { 
+        message: 'Please log in to update blog posts.',
+        returnUrl: '/login'
+      });
+    }
+    
     blogModel.updateBlog(blogId, title, content, country, visit_date, (err) => {
-      if (err) return res.send('Error updating blog.');
+      if (err) {
+        return res.status(500).render('error', { 
+          message: 'Error updating blog post. Please try again.',
+          returnUrl: `/blog/edit/${blogId}`
+        });
+      }
       res.redirect('/');
     });
   },
 
   deleteBlogPost: (req, res) => {
     const blogId = req.params.id;
+    
+    if (!req.session.user) {
+      return res.status(401).render('error', { 
+        message: 'Please log in to delete blog posts.',
+        returnUrl: '/login'
+      });
+    }
+    
     blogModel.getBlogById(blogId, (err, blog) => {
-      if (err || !blog) return res.send('Blog not found.');
-      if (blog.user_id !== req.session.user.id) return res.send('Unauthorized.');
+      if (err || !blog) {
+        return res.status(404).render('error', { 
+          message: 'Blog post not found.',
+          returnUrl: '/'
+        });
+      }
+      
+      if (blog.user_id !== req.session.user.id) {
+        return res.status(403).render('error', { 
+          message: 'You are not authorized to delete this blog post.',
+          returnUrl: '/'
+        });
+      }
+      
       blogModel.deleteBlog(blogId, (err) => {
-        if (err) return res.send('Error deleting blog.');
+        if (err) {
+          return res.status(500).render('error', { 
+            message: 'Error deleting blog post. Please try again.',
+            returnUrl: '/'
+          });
+        }
         res.redirect('/');
       });
     });
   },
 
   searchBlogs: async (req, res) => {
+    console.log('=== SEARCH BLOGS CALLED ===');
+    console.log('Query params:', req.query);
+    
     const query = req.query.query?.trim() || '';
-    const searchType = req.query.searchType || 'country'; // Default to country search
+    const searchType = req.query.searchType || 'country';
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
     const offset = (page - 1) * limit;
+
+    console.log('Search query:', query);
+    console.log('Search type:', searchType);
 
     if (!query) {
       return res.redirect('/');
@@ -203,13 +350,13 @@ const blogController = {
     let values;
     
     if (searchType === 'country') {
-      // Search only by country
-      whereClause = 'WHERE LOWER(blogs.country) LIKE ?';
-      values = [`%${query.toLowerCase()}%`, limit, offset];
+      // Use LIKE for partial match search for country
+      whereClause = 'WHERE LOWER(blogs.country) LIKE LOWER(?)';
+      values = [`%${query}%`, limit, offset];
     } else if (searchType === 'author') {
-      // Search only by author
-      whereClause = 'WHERE LOWER(users.name) LIKE ?';
-      values = [`%${query.toLowerCase()}%`, limit, offset];
+      // Use LIKE for partial match search for author
+      whereClause = 'WHERE LOWER(users.name) LIKE LOWER(?)';
+      values = [`%${query}%`, limit, offset];
     }
 
     const blogSearchSQL = `
@@ -221,10 +368,33 @@ const blogController = {
       LIMIT ? OFFSET ?
     `;
 
+    console.log('SQL Query:', blogSearchSQL);
+    console.log('Values:', values);
+
     db.all(blogSearchSQL, values, async (err, blogs) => {
       if (err) {
-        console.error(err);
-        return res.status(500).send('Server Error');
+        console.error('Database error:', err);
+        return res.status(500).render('error', { 
+          message: 'Error searching blog posts. Please try again.',
+          returnUrl: '/'
+        });
+      }
+
+      console.log('Found blogs:', blogs.length);
+
+      // Check if no results found
+      if (blogs.length === 0) {
+        let errorMessage;
+        if (searchType === 'country') {
+          errorMessage = `No blog posts found for country "${query}". Please check the spelling or try another country.`;
+        } else {
+          errorMessage = `No blog posts found by author "${query}". Please check the spelling or try another author.`;
+        }
+        
+        return res.render('error', {
+          message: errorMessage,
+          returnUrl: '/'
+        });
       }
 
       const userId = req.session.user?.id;
@@ -260,14 +430,21 @@ const blogController = {
           try {
             const resp = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(blog.country)}?fullText=true`);
             const data = await resp.json();
-            const country = data[0];
-            countryCache[blog.country.toLowerCase()] = {
-              flag: country.flag || '',
-              capital: country.capital?.[0] || 'N/A',
-              currency: Object.keys(country.currencies || {})[0] || 'N/A'
-            };
+            
+            // Check if data is an array with at least one country
+            if (Array.isArray(data) && data.length > 0) {
+              const country = data[0];
+              countryCache[blog.country.toLowerCase()] = {
+                flag: country.flag || '',
+                capital: country.capital?.[0] || 'N/A',
+                currency: Object.keys(country.currencies || {})[0] || 'N/A'
+              };
+            } else {
+              // If no country found, set null
+              countryCache[blog.country.toLowerCase()] = null;
+            }
           } catch (err) {
-            console.error('Country fetch error:', err);
+            console.error('Country fetch error for:', blog.country);
             countryCache[blog.country.toLowerCase()] = null;
           }
         }
@@ -275,19 +452,15 @@ const blogController = {
         blog.countryInfo = countryCache[blog.country?.toLowerCase()] || null;
       }
 
-      const renderOptions = {
+      res.render('search-results', {
         blogs,
         query,
         searchType,
         page,
         nextPage: page + 1,
         prevPage: page > 1 ? page - 1 : 1,
-        limit,
-        recentPosts: [],  // No recent posts in search results
-        popularPosts: []  // No popular posts in search results
-      };
-
-      res.render('home', renderOptions);
+        limit
+      });
     });
   }
 };

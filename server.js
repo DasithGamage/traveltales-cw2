@@ -1,40 +1,64 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const authRoutes = require('./routes/authRoutes');
-const blogRoutes = require('./routes/blogRoutes'); // Added blog routes
-const followRoutes = require('./routes/followRoutes'); // Follow routes
-const likeRoutes = require('./routes/likeRoutes'); // Likes routes
-
 const app = express();
-const PORT = 3000;
 
-// Middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+const blogRoutes = require('./routes/blogRoutes');
+const followRoutes = require('./routes/followRoutes');
+const likeRoutes = require('./routes/likeRoutes');
+
+// Set up EJS view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Session setup
+// Middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Serve static files (CSS, JS, images)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Set up session
 app.use(session({
-  secret: 'yourSecretKey',
+  secret: 'your-secret-key',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false,
+  cookie: { maxAge: 3600000 } // 1 hour
 }));
 
-// Make session available to EJS templates
+// Make session available in all views
 app.use((req, res, next) => {
   res.locals.session = req.session;
   next();
 });
 
-// Route handling
-app.use('/', authRoutes);
-app.use('/', blogRoutes); // Registered blog routes and Search routes
-app.use('/', followRoutes); // Follow routes
-app.use('/', likeRoutes); // Like routes
+// Routes - IMPORTANT: blogRoutes must come before authRoutes
+app.use('/', blogRoutes);     // Blog routes first (includes /search for blogs)
+app.use('/', authRoutes);     // Auth routes second
+app.use('/', followRoutes);
+app.use('/', likeRoutes);
+
+// 404 Error handler
+app.use((req, res, next) => {
+  res.status(404).render('error', {
+    message: 'Page not found',
+    returnUrl: '/'
+  });
+});
+
+// General error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).render('error', {
+    message: 'Something went wrong! Please try again later.',
+    returnUrl: '/'
+  });
+});
 
 // Start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
