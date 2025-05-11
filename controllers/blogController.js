@@ -131,11 +131,10 @@ const blogController = {
         const renderOptions = {
           blogs,
           query: '',
-          sort: 'date',
+          searchType: '',
           page,
           prevPage: page > 1 ? page - 1 : 1,
           nextPage: page + 1,
-          matchedUsers: [],
           limit,
           recentPosts,
           popularPosts
@@ -189,34 +188,38 @@ const blogController = {
   },
 
   searchBlogs: async (req, res) => {
-    const query = req.query.query?.trim().toLowerCase() || '';
-    const sort = req.query.sort === 'likes' ? 'likes' : 'date';
+    const query = req.query.query?.trim() || '';
+    const searchType = req.query.searchType || 'country'; // Default to country search
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
     const offset = (page - 1) * limit;
 
-    let orderByClause = 'blogs.created_at DESC';
-    if (sort === 'likes') {
-      orderByClause = `(SELECT COUNT(*) FROM likes WHERE likes.blog_id = blogs.id AND likes.type = "like") DESC`;
+    if (!query) {
+      return res.redirect('/');
     }
 
-    const userSearchSQL = `SELECT id, name FROM users WHERE LOWER(name) LIKE ?`;
-    const matchedUsers = await new Promise((resolve, reject) => {
-      db.all(userSearchSQL, [`%${query}%`], (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
+    // Build the WHERE clause based on search type
+    let whereClause;
+    let values;
+    
+    if (searchType === 'country') {
+      // Search only by country
+      whereClause = 'WHERE LOWER(blogs.country) LIKE ?';
+      values = [`%${query.toLowerCase()}%`, limit, offset];
+    } else if (searchType === 'author') {
+      // Search only by author
+      whereClause = 'WHERE LOWER(users.name) LIKE ?';
+      values = [`%${query.toLowerCase()}%`, limit, offset];
+    }
 
     const blogSearchSQL = `
       SELECT blogs.*, users.name AS author
       FROM blogs
       JOIN users ON blogs.user_id = users.id
-      WHERE LOWER(users.name) LIKE ? OR LOWER(blogs.country) LIKE ?
-      ORDER BY ${orderByClause}
+      ${whereClause}
+      ORDER BY blogs.created_at DESC
       LIMIT ? OFFSET ?
     `;
-    const values = [`%${query}%`, `%${query}%`, limit, offset];
 
     db.all(blogSearchSQL, values, async (err, blogs) => {
       if (err) {
@@ -272,34 +275,19 @@ const blogController = {
         blog.countryInfo = countryCache[blog.country?.toLowerCase()] || null;
       }
 
-      const [recentPosts, popularPosts] = await Promise.all([getRecentPosts(), getPopularPosts()]);
-
       const renderOptions = {
         blogs,
         query,
-        sort,
+        searchType,
         page,
         nextPage: page + 1,
         prevPage: page > 1 ? page - 1 : 1,
-        matchedUsers,
         limit,
-        recentPosts,
-        popularPosts
+        recentPosts: [],  // No recent posts in search results
+        popularPosts: []  // No popular posts in search results
       };
 
-      if (userId) {
-        followModel.getFollowerCount(userId, (err1, followerResult) => {
-          followModel.getFollowingCount(userId, (err2, followingResult) => {
-            return res.render('home', {
-              ...renderOptions,
-              followerCount: followerResult?.count || 0,
-              followingCount: followingResult?.count || 0
-            });
-          });
-        });
-      } else {
-        res.render('home', renderOptions);
-      }
+      res.render('home', renderOptions);
     });
   }
 };
