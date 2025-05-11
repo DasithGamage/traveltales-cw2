@@ -46,7 +46,10 @@ const blogController = {
     const { title, content, country, visit_date } = req.body;
     const userId = req.session.user.id;
 
-    if (!title || !content) return res.send('Title and content are required.');
+    //  All 4 fields are required
+    if (!title || !content || !country || !visit_date) {
+      return res.send('All fields (title, content, country, visit date) are required.');
+    }
 
     blogModel.createBlog(userId, title, content, country, visit_date, (err) => {
       if (err) {
