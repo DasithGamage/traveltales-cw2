@@ -506,6 +506,207 @@ const blogController = {
         limit
       });
     });
+  },
+
+  // API Methods - Added for API functionality
+  getAllBlogsAPI: (req, res) => {
+    db.all(
+      `SELECT blogs.*, users.name AS author 
+       FROM blogs 
+       JOIN users ON blogs.user_id = users.id 
+       ORDER BY blogs.created_at DESC`,
+      [],
+      (err, blogs) => {
+        if (err) {
+          return res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch blogs' 
+          });
+        }
+        res.json({ 
+          success: true, 
+          data: blogs,
+          count: blogs.length 
+        });
+      }
+    );
+  },
+
+  getBlogByIdAPI: (req, res) => {
+    const blogId = req.params.id;
+    
+    db.get(
+      `SELECT blogs.*, users.name AS author 
+       FROM blogs 
+       JOIN users ON blogs.user_id = users.id 
+       WHERE blogs.id = ?`,
+      [blogId],
+      (err, blog) => {
+        if (err) {
+          return res.status(500).json({ 
+            success: false, 
+            error: 'Database error' 
+          });
+        }
+        
+        if (!blog) {
+          return res.status(404).json({ 
+            success: false, 
+            error: 'Blog not found' 
+          });
+        }
+        
+        res.json({ 
+          success: true, 
+          data: blog 
+        });
+      }
+    );
+  },
+
+  createBlogAPI: (req, res) => {
+    const { title, content, country, visit_date, user_id } = req.body;
+    
+    // Validate required fields
+    if (!title || !content || !country || !visit_date || !user_id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'All fields are required' 
+      });
+    }
+    
+    blogModel.createBlog(user_id, title, content, country, visit_date, (err) => {
+      if (err) {
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Failed to create blog' 
+        });
+      }
+      
+      res.status(201).json({ 
+        success: true, 
+        message: 'Blog created successfully' 
+      });
+    });
+  },
+
+  updateBlogAPI: (req, res) => {
+    const blogId = req.params.id;
+    const { title, content, country, visit_date } = req.body;
+    
+    blogModel.updateBlog(blogId, title, content, country, visit_date, (err) => {
+      if (err) {
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Failed to update blog' 
+        });
+      }
+      
+      res.json({ 
+        success: true, 
+        message: 'Blog updated successfully' 
+      });
+    });
+  },
+
+  deleteBlogAPI: (req, res) => {
+    const blogId = req.params.id;
+    
+    blogModel.deleteBlog(blogId, (err) => {
+      if (err) {
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Failed to delete blog' 
+        });
+      }
+      
+      res.json({ 
+        success: true, 
+        message: 'Blog deleted successfully' 
+      });
+    });
+  },
+
+  searchBlogsAPI: async (req, res) => {
+    const query = req.query.query?.trim() || '';
+    const searchType = req.query.searchType || 'country';
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    if (!query) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Search query is required' 
+      });
+    }
+
+    let whereClause;
+    let values;
+    
+    if (searchType === 'country') {
+      whereClause = 'WHERE LOWER(blogs.country) LIKE LOWER(?)';
+      values = [`%${query}%`, limit, offset];
+    } else if (searchType === 'author') {
+      whereClause = 'WHERE LOWER(users.name) LIKE LOWER(?)';
+      values = [`%${query}%`, limit, offset];
+    }
+
+    const blogSearchSQL = `
+      SELECT blogs.*, users.name AS author
+      FROM blogs
+      JOIN users ON blogs.user_id = users.id
+      ${whereClause}
+      ORDER BY blogs.created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    db.all(blogSearchSQL, values, (err, blogs) => {
+      if (err) {
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Search query failed' 
+        });
+      }
+
+      res.json({ 
+        success: true, 
+        data: blogs,
+        count: blogs.length,
+        page,
+        limit
+      });
+    });
+  },
+
+  getPopularPostsAPI: async (req, res) => {
+    try {
+      const posts = await getPopularPosts();
+      res.json({ 
+        success: true, 
+        data: posts 
+      });
+    } catch (err) {
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch popular posts' 
+      });
+    }
+  },
+
+  getRecentPostsAPI: async (req, res) => {
+    try {
+      const posts = await getRecentPosts();
+      res.json({ 
+        success: true, 
+        data: posts 
+      });
+    } catch (err) {
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch recent posts' 
+      });
+    }
   }
 };
 

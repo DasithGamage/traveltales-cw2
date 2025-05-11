@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const followRoutes = require('./routes/followRoutes');
 const likeRoutes = require('./routes/likeRoutes');
+const apiRoutes = require('./routes/apiRoutes'); // New API routes
 
 // Set up EJS view engine
 app.set('view engine', 'ejs');
@@ -39,6 +40,7 @@ app.use('/', blogRoutes);     // Blog routes first (includes /search for blogs)
 app.use('/', authRoutes);     // Auth routes second
 app.use('/', followRoutes);
 app.use('/', likeRoutes);
+app.use('/api', apiRoutes);   // API routes with prefix
 
 // 404 Error handler
 app.use((req, res, next) => {
