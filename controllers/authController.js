@@ -13,9 +13,15 @@ const authController = {
       return res.send('All fields are required');
     }
 
-    userModel.findUserByEmail(email, (err, user) => {
+    // Check if email already exists
+    userModel.checkEmailExists(email, (err, user) => {
+      if (err) {
+        console.error(err);
+        return res.send('Server error. Please try again.');
+      }
+
       if (user) {
-        return res.send('Email already registered.');
+        return res.send('Email already registered. Please log in or use another email.');
       }
 
       const hashedPassword = bcrypt.hashSync(password, 10);

@@ -24,6 +24,12 @@ module.exports = {
     db.get(sql, [email], callback);
   },
 
+  // Check if email already exists (used for registration)
+  checkEmailExists: (email, callback) => {
+    const sql = `SELECT id FROM users WHERE email = ?`;
+    db.get(sql, [email], callback);
+  },
+
   // Find user by ID
   findUserById: (id, callback) => {
     const sql = `SELECT * FROM users WHERE id = ?`;
