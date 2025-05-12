@@ -1,6 +1,18 @@
 const likeModel = require('../models/likeModel');
 
+/**
+ * Like Controller
+ * Handles likes and dislikes functionality for blog posts
+ * Manages user interactions with blog content
+ */
 const likeController = {
+  /**
+   * Like a blog post
+   * Adds or updates a like reaction from the current user
+   * 
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
   like: (req, res) => {
     // Check if user is logged in
     if (!req.session.user) {
@@ -13,6 +25,7 @@ const likeController = {
     const userId = req.session.user.id;
     const blogId = parseInt(req.params.id);
 
+    // Add or update like reaction in database
     likeModel.addOrUpdateReaction(userId, blogId, 'like', (err) => {
       if (err) {
         console.error(err);
@@ -27,6 +40,13 @@ const likeController = {
     });
   },
 
+  /**
+   * Dislike a blog post
+   * Adds or updates a dislike reaction from the current user
+   * 
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
   dislike: (req, res) => {
     // Check if user is logged in
     if (!req.session.user) {
@@ -39,6 +59,7 @@ const likeController = {
     const userId = req.session.user.id;
     const blogId = parseInt(req.params.id);
 
+    // Add or update dislike reaction in database
     likeModel.addOrUpdateReaction(userId, blogId, 'dislike', (err) => {
       if (err) {
         console.error(err);

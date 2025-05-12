@@ -3,6 +3,7 @@
 <div class="welcome-section">
   <h2>Welcome to TravelTales!</h2>
   
+  <!-- Personalized welcome for logged-in users with follower stats -->
   <% if (session && session.user) { %>
     <p>You are logged in as <strong><%= session.user.name %></strong></p>
     <% if (typeof followerCount !== 'undefined' && typeof followingCount !== 'undefined') { %>
@@ -13,12 +14,13 @@
   <% } %>
 </div>
 
-<!-- Country Information Dropdown -->
+<!-- Country information explorer section with dropdown -->
 <div class="country-info">
   <h3>Explore Countries</h3>
   <select id="countryDropdown">
     <option value="">Select a country to view information...</option>
   </select>
+  <!-- Country details display (hidden initially) -->
   <div id="countryInfo" class="country-data" style="display: none;">
     <h4 id="selectedCountryName" style="color: #2c3e50; margin-bottom: 15px; font-size: 1.5em; text-align: center;"></h4>
     <div class="country-info-grid">
@@ -38,44 +40,57 @@
   </div>
 </div>
 
+<!-- Script to fetch and display country information -->
 <script>
-// Fetch all countries for the dropdown
+// Fetch all countries for the dropdown using the REST Countries API
 fetch('https://restcountries.com/v3.1/all?fields=name,capital,currencies,flags,flag')
   .then(response => response.json())
   .then(countries => {
     const dropdown = document.getElementById('countryDropdown');
+    
+    // Sort countries alphabetically for better usability
     countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+    
+    // Populate dropdown with countries and their data
     countries.forEach(country => {
       const option = document.createElement('option');
       option.value = country.name.common;
       option.textContent = country.name.common;
+      
+      // Store country details in data attributes for easy access
       option.dataset.flag = country.flag || '';
       option.dataset.flagPng = country.flags?.png || '';
       option.dataset.capital = country.capital?.[0] || 'N/A';
       option.dataset.currency = Object.keys(country.currencies || {})[0] || 'N/A';
+      
       dropdown.appendChild(option);
     });
   });
 
-// Display country information when selected
+// Display country information when a country is selected
 document.getElementById('countryDropdown').addEventListener('change', function(e) {
   const selectedOption = e.target.options[e.target.selectedIndex];
   const infoDiv = document.getElementById('countryInfo');
   
   if (selectedOption.value) {
+    // Populate country information elements
     document.getElementById('selectedCountryName').textContent = selectedOption.value;
     document.getElementById('countryFlag').textContent = selectedOption.dataset.flag;
     document.getElementById('countryCapital').textContent = selectedOption.dataset.capital;
     document.getElementById('countryCurrency').textContent = selectedOption.dataset.currency;
+    
+    // Show the country information section
     infoDiv.style.display = 'block';
   } else {
+    // Hide the information section if no country is selected
     infoDiv.style.display = 'none';
   }
 });
 </script>
 
+<!-- Featured posts section with two columns layout -->
 <div class="posts-grid">
-  <!-- 🔥 Most Liked Posts -->
+  <!-- Popular posts column -->
   <div class="posts-section">
     <h3>🔥 Most Liked Posts</h3>
     <div class="post-cards-container">
@@ -90,6 +105,7 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
               </p>
             <% } %>
             <div class="content-preview">
+              <!-- Show truncated post content with ellipsis -->
               <p><%= post.content.slice(0, 150) %>...</p>
             </div>
             <a href="/blog/<%= post.id %>" class="read-more-btn">Read more →</a>
@@ -99,7 +115,7 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
     </div>
   </div>
 
-  <!-- 🆕 Recent Posts -->
+  <!-- Recent posts column -->
   <div class="posts-section">
     <h3>🆕 Recent Posts</h3>
     <div class="post-cards-container">
@@ -124,7 +140,7 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
   </div>
 </div>
 
-<!-- Search Blog Posts -->
+<!-- Search form for finding blog posts -->
 <div class="search-box">
   <h3>Search Blog Posts</h3>
   <form action="/search" method="GET" class="search-form">
@@ -139,18 +155,22 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
 
 <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
 
+<!-- All blog posts section -->
 <h3 style="font-size: 1.5em; margin-bottom: 20px;">All Blog Posts</h3>
 
 <% if (!blogs || blogs.length === 0) { %>
+  <!-- Display message when no blogs exist -->
   <p style="text-align: center; padding: 40px; font-size: 1.1em; color: #7f8c8d;">
     No blog posts found. Be the first to share your travel story!
   </p>
 <% } else { %>
+  <!-- Loop through and display all blog posts -->
   <% blogs.forEach(blog => { %>
     <div class="blog-post">
       <h4><%= blog.title %></h4>
       <p class="meta">By <%= blog.author %> on <%= blog.created_at.split('T')[0] %></p>
       
+      <!-- Country details section with flag, capital, currency -->
       <div class="country-details">
         <% if (blog.country) { %><p><strong>🌍 Country:</strong> <%= blog.country %></p><% } %>
         <% if (blog.visit_date) { %><p><strong>📅 Visited on:</strong> <%= blog.visit_date %></p><% } %>
@@ -168,13 +188,16 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
 
       <p class="content"><%= blog.content %></p>
 
+      <!-- Actions section for each blog post -->
       <div class="blog-actions">
         <div class="left-actions">
+          <!-- Edit/Delete options (shown only to post author) -->
           <% if (session.user && session.user.id === blog.user_id) { %>
             <a href="/blog/edit/<%= blog.id %>">Edit</a>
             <a href="/blog/delete/<%= blog.id %>" onclick="return confirm('Are you sure?')">Delete</a>
           <% } %>
           
+          <!-- Follow/Unfollow button (shown only to other users) -->
           <% if (session.user && session.user.id !== blog.user_id) { %>
             <% if (blog.isFollowing) { %>
               <form action="/unfollow/<%= blog.user_id %>" method="POST">
@@ -188,6 +211,7 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
           <% } %>
         </div>
         
+        <!-- Like/Dislike counters and buttons -->
         <div class="right-actions">
           <span style="margin-right: 15px;">👍 <%= blog.likes %> | 👎 <%= blog.dislikes %></span>
           <form action="/like/<%= blog.id %>" method="POST">
@@ -201,7 +225,7 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
     </div>
   <% }) %>
 
-  <!-- Pagination -->
+  <!-- Pagination controls -->
   <div class="pagination">
     <% if (page > 1) { %>
       <a href="?page=<%= prevPage %>">⬅ Previous</a>

@@ -1,5 +1,11 @@
 const sqlite3 = require('sqlite3').verbose();
 
+/**
+ * Database Connection Module
+ * Creates and initializes the SQLite database connection 
+ * and sets up the required tables if they don't exist
+ */
+
 // Connect to a SQLite database file (creates it if not existing)
 const db = new sqlite3.Database('./database.db', (err) => {
   if (err) {
@@ -9,7 +15,8 @@ const db = new sqlite3.Database('./database.db', (err) => {
   }
 });
 
-// Create blog table if not exists
+// Create blogs table if not exists
+// This table stores all blog posts with foreign key to users
 db.run(`
   CREATE TABLE IF NOT EXISTS blogs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,6 +31,7 @@ db.run(`
 `);
 
 // Create follows table if not exists
+// This table manages user following relationships
 db.run(`
   CREATE TABLE IF NOT EXISTS follows (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,20 +42,22 @@ db.run(`
   )
 `);
 
-// Likes table
+// Create likes table if not exists
+// This table tracks like/dislike reactions on blog posts
 db.run(`
   CREATE TABLE IF NOT EXISTS likes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     blog_id INTEGER NOT NULL,
     type TEXT CHECK(type IN ('like', 'dislike')) NOT NULL,
-    UNIQUE(user_id, blog_id), -- prevents duplicate likes/dislikes
+    UNIQUE(user_id, blog_id), -- prevents duplicate likes/dislikes from same user
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (blog_id) REFERENCES blogs(id)
 )
 `);
 
-// Add security questions table
+// Create security questions table if not exists
+// This table stores security questions for password recovery
 db.run(`
   CREATE TABLE IF NOT EXISTS security_questions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,4 +72,5 @@ db.run(`
   )
 `);
 
+// Export the database connection for use in other modules
 module.exports = db;

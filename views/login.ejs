@@ -3,12 +3,14 @@
 <div class="form-container">
   <h2>Login</h2>
   
+  <!-- Success message shown after registration -->
   <% if (query && query.registered === 'true') { %>
     <div style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
       Registration successful! Please log in with your credentials.
     </div>
   <% } %>
   
+  <!-- Login form -->
   <form action="/login" method="POST" class="login-form">
     <div class="form-group">
       <label for="email">Email:</label>
@@ -23,6 +25,7 @@
     <button type="submit" class="btn btn-success">Login</button>
   </form>
   
+  <!-- Password recovery link -->
   <p style="margin-top: 20px; text-align: center;">
     <a href="/forgot-password">Forgot your password?</a>
   </p>

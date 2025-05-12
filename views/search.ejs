@@ -1,20 +1,25 @@
+<!-- User search results list with follow/unfollow functionality -->
 <% users.forEach(user => { %>
     <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+      <!-- User name display -->
       <p><strong><%= user.name %></strong></p>
   
+      <!-- Follow/unfollow buttons or self-indication -->
       <% if (session.user.id !== user.id) { %>
         <% if (user.isFollowing) { %>
+          <!-- Unfollow button for users you're currently following -->
           <form action="/unfollow/<%= user.id %>" method="POST" style="display:inline;">
             <button type="submit">Unfollow</button>
           </form>
         <% } else { %>
+          <!-- Follow button for users you're not following -->
           <form action="/follow/<%= user.id %>" method="POST" style="display:inline;">
             <button type="submit">Follow</button>
           </form>
         <% } %>
       <% } else { %>
+        <!-- Indication that this is the current user -->
         <p>(This is you)</p>
       <% } %>
     </div>
-  <% }) %>
-  
+<% }) %>

@@ -1,7 +1,9 @@
 <%- include('layout') %>
 
 <div class="message-container">
+  <!-- Message display box with styling based on message type -->
   <div class="message-box <%= type %>">
+    <!-- Icon based on message type (success, error, info) -->
     <% if (type === 'success') { %>
       <div class="message-icon">✓</div>
     <% } else if (type === 'error') { %>
@@ -10,11 +12,13 @@
       <div class="message-icon">i</div>
     <% } %>
     
+    <!-- Message content with dynamic header based on type -->
     <div class="message-content">
       <h3><%= type === 'success' ? 'Success!' : type === 'error' ? 'Error' : 'Information' %></h3>
       <p><%= message %></p>
     </div>
     
+    <!-- Navigation buttons based on whether a redirect URL is provided -->
     <% if (redirectUrl) { %>
       <div class="message-actions">
         <a href="<%= redirectUrl %>" class="btn btn-primary">Continue</a>

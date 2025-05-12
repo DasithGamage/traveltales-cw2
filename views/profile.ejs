@@ -3,7 +3,9 @@
 <div class="form-container">
   <h2>My Profile</h2>
   
+  <!-- User profile update form -->
   <form action="/profile/update" method="POST">
+    <!-- Basic profile information fields -->
     <div class="form-group">
       <label>Name:</label>
       <input type="text" name="name" value="<%= user.name %>" required>
@@ -19,6 +21,7 @@
   
   <hr>
   
+  <!-- Password change section -->
   <h3>Change Password</h3>
   <form action="/profile/change-password" method="POST">
     <div class="form-group">
@@ -41,5 +44,6 @@
   
   <hr>
   
+  <!-- Password recovery link -->
   <p><a href="/forgot-password">Forgot your password?</a></p>
 </div>

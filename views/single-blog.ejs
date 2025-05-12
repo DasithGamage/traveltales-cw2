@@ -1,10 +1,12 @@
 <%- include('layout') %>
 
 <div class="container">
+  <!-- Single blog post display with enhanced details -->
   <div class="blog-post">
     <h2><%= blog.title %></h2>
     <p class="meta">By <%= blog.author %> on <%= blog.created_at.split('T')[0] %></p>
     
+    <!-- Country information section with flag, capital, and currency -->
     <div class="country-details">
       <% if (blog.country) { %><p><strong>🌍 Country:</strong> <%= blog.country %></p><% } %>
       <% if (blog.visit_date) { %><p><strong>📅 Visited on:</strong> <%= blog.visit_date %></p><% } %>
@@ -20,15 +22,19 @@
       <% } %>
     </div>
 
+    <!-- Full blog content -->
     <p class="content"><%= blog.content %></p>
 
+    <!-- User interaction section (edit/delete/follow/like) -->
     <div class="blog-actions">
       <div class="left-actions">
+        <!-- Edit/Delete buttons (only shown to post author) -->
         <% if (session && session.user && session.user.id === blog.user_id) { %>
           <a href="/blog/edit/<%= blog.id %>">Edit</a>
           <a href="/blog/delete/<%= blog.id %>" onclick="return confirm('Are you sure?')">Delete</a>
         <% } %>
         
+        <!-- Follow/Unfollow button (only shown to other logged-in users) -->
         <% if (session && session.user && session.user.id !== blog.user_id) { %>
           <% if (blog.isFollowing) { %>
             <form action="/unfollow/<%= blog.user_id %>" method="POST" style="display: inline;">
@@ -42,6 +48,7 @@
         <% } %>
       </div>
       
+      <!-- Like/Dislike buttons and counters -->
       <div class="right-actions">
         <span style="margin-right: 15px;">👍 <%= blog.likes %> | 👎 <%= blog.dislikes %></span>
         <% if (session && session.user) { %>
@@ -56,6 +63,7 @@
     </div>
   </div>
   
+  <!-- Back button to return to blog listing -->
   <div style="text-align: center; margin-top: 20px;">
     <a href="/" class="btn btn-primary">← Back to All Posts</a>
   </div>

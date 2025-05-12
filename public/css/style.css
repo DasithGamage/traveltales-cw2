@@ -1,4 +1,6 @@
-/* Basic Reset */
+/* =========================================
+   BASIC RESET & GLOBAL STYLES
+   ========================================= */
 * {
     margin: 0;
     padding: 0;
@@ -12,15 +14,18 @@ body {
     color: #333;
 }
 
-/* Navigation */
+/* =========================================
+   NAVIGATION STYLES
+   ========================================= */
 nav {
+    /* Gradient background for visual appeal */
     background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
     color: white;
     padding: 15px 0;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    position: sticky;
+    position: sticky; /* Sticky navigation for better UX */
     top: 0;
-    z-index: 1000;
+    z-index: 1000; /* Ensure nav stays on top of other elements */
 }
 
 nav .nav-content {
@@ -38,6 +43,7 @@ nav .nav-content {
     font-size: 2em;
     font-weight: bold;
     letter-spacing: -1px;
+    /* Gradient text effect for brand name */
     background: linear-gradient(45deg, #fff, #f0f0f0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -49,24 +55,26 @@ nav a {
     color: white;
     text-decoration: none;
     margin-left: 25px;
-    transition: all 0.3s;
+    transition: all 0.3s; /* Smooth hover transition */
     padding: 5px 10px;
     border-radius: 5px;
 }
 
 nav a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle hover effect */
+    transform: translateY(-2px); /* Slight lift on hover */
 }
 
-/* Main Container */
+/* =========================================
+   CONTAINER & LAYOUT
+   ========================================= */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* Welcome Section */
+/* Welcome section styling */
 .welcome-section {
     text-align: center;
     margin-bottom: 40px;
@@ -79,7 +87,9 @@ nav a:hover {
     color: #2c3e50;
 }
 
-/* Country Info Box with improved dropdown */
+/* =========================================
+   COUNTRY INFORMATION SECTION
+   ========================================= */
 .country-info {
     background-color: white;
     padding: 25px;
@@ -88,6 +98,7 @@ nav a:hover {
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
+/* Custom select styling with dropdown arrow */
 .country-info select {
     width: 100%;
     padding: 12px 40px 12px 15px;
@@ -96,7 +107,8 @@ nav a:hover {
     font-size: 16px;
     background-color: white;
     cursor: pointer;
-    appearance: none;
+    appearance: none; /* Remove default arrow */
+    /* Custom dropdown arrow using SVG */
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 15px center;
@@ -111,10 +123,10 @@ nav a:hover {
     border: 1px solid #e9ecef;
 }
 
-/* Country Info Grid - Simplified without boxes */
+/* Country info grid layout */
 .country-info-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
     gap: 40px;
     margin-top: 20px;
     text-align: center;
@@ -153,36 +165,39 @@ nav a:hover {
     margin-bottom: 0;
 }
 
-/* Theme-aligned background highlights for different info types */
+/* Theme-specific background colors for different info types */
 .flag-card .info-value {
-    background-color: #fff5f0;
+    background-color: #fff5f0; /* Warm color for flags */
     color: #2c3e50;
 }
 
 .capital-card .info-value {
-    background-color: #f0faff;
+    background-color: #f0faff; /* Cool blue for capitals */
     color: #2c3e50;
 }
 
 .currency-card .info-value {
-    background-color: #f0fff4;
+    background-color: #f0fff4; /* Light green for currency */
     color: #2c3e50;
 }
 
+/* Responsive country info for smaller screens */
 @media (max-width: 768px) {
     .country-info-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Stack on mobile */
         gap: 30px;
     }
 }
 
-/* Posts Grid Layout - Equal height cards */
+/* =========================================
+   POSTS GRID LAYOUT
+   ========================================= */
 .posts-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* Two equal columns */
     gap: 30px;
     margin-bottom: 40px;
-    align-items: stretch;
+    align-items: stretch; /* Equal height cards */
 }
 
 .posts-section {
@@ -204,37 +219,38 @@ nav a:hover {
     gap: 10px;
 }
 
-/* Post Cards - Equal height */
+/* Post cards container with equal height */
 .post-cards-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    flex: 1;
+    flex: 1; /* Fill available space */
 }
 
 .post-card {
     padding: 20px;
     border-radius: 8px;
     border: 1px solid #e9ecef;
-    transition: all 0.3s;
+    transition: all 0.3s; /* Smooth hover animation */
     display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 1; /* Equal height */
 }
 
 .post-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px); /* Lift effect on hover */
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
+/* Theme-specific styles for different post types */
 .popular-post {
-    background-color: #fff5f0;
-    border-left: 4px solid #ff6b6b;
+    background-color: #fff5f0; /* Warm background for popular posts */
+    border-left: 4px solid #ff6b6b; /* Highlight bar */
 }
 
 .recent-post {
-    background-color: #f0faff;
-    border-left: 4px solid #4dabf7;
+    background-color: #f0faff; /* Cool background for recent posts */
+    border-left: 4px solid #4dabf7; /* Highlight bar */
 }
 
 .post-card h4 {
@@ -250,11 +266,11 @@ nav a:hover {
 }
 
 .post-card .content-preview {
-    flex-grow: 1;
+    flex-grow: 1; /* Push read more button to bottom */
     margin-bottom: 15px;
 }
 
-/* Read more button - smaller and less prominent */
+/* Read more button styling */
 .read-more-btn {
     padding: 6px 15px;
     font-size: 14px;
@@ -265,7 +281,7 @@ nav a:hover {
     text-decoration: none;
     display: inline-block;
     transition: all 0.3s;
-    opacity: 0.8;
+    opacity: 0.8; /* Subtle initial state */
 }
 
 .read-more-btn:hover {
@@ -273,7 +289,9 @@ nav a:hover {
     transform: translateY(-1px);
 }
 
-/* Search Box - Improved layout */
+/* =========================================
+   SEARCH BOX STYLING
+   ========================================= */
 .search-box {
     background-color: white;
     padding: 30px;
@@ -294,6 +312,7 @@ nav a:hover {
     align-items: stretch;
 }
 
+/* Custom select dropdown styling */
 .search-form select {
     padding: 12px 40px 12px 15px;
     border: 2px solid #ddd;
@@ -302,7 +321,8 @@ nav a:hover {
     background-color: white;
     cursor: pointer;
     min-width: 200px;
-    appearance: none;
+    appearance: none; /* Remove default arrow */
+    /* Custom dropdown arrow */
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 15px center;
@@ -317,13 +337,16 @@ nav a:hover {
     font-size: 16px;
 }
 
+/* Focus states for form elements */
 .search-form input[type="text"]:focus,
 .search-form select:focus {
     border-color: #3498db;
     outline: none;
 }
 
-/* Button Styles - Consistent design */
+/* =========================================
+   BUTTON STYLES
+   ========================================= */
 button, .btn {
     padding: 12px 25px;
     border: none;
@@ -337,10 +360,11 @@ button, .btn {
 }
 
 button:hover, .btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px); /* Lift effect */
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+/* Button color variants */
 .btn-primary {
     background-color: #3498db;
     color: white;
@@ -377,7 +401,7 @@ button:hover, .btn:hover {
     background-color: #e67e22;
 }
 
-/* Form specific buttons */
+/* Form-specific button styling */
 .search-form button {
     background-color: #3498db;
     color: white;
@@ -387,6 +411,7 @@ button:hover, .btn:hover {
     background-color: #2980b9;
 }
 
+/* Blog interaction buttons */
 .like-btn {
     background-color: #3498db;
     color: white;
@@ -408,7 +433,9 @@ button:hover, .btn:hover {
     font-size: 14px;
 }
 
-/* Blog Posts - Better layout */
+/* =========================================
+   BLOG POST STYLING
+   ========================================= */
 .blog-post {
     background-color: white;
     padding: 30px;
@@ -438,6 +465,7 @@ button:hover, .btn:hover {
     font-size: 1.05em;
 }
 
+/* Country details section inside blog posts */
 .blog-post .country-details {
     background-color: #f8f9fa;
     padding: 15px;
@@ -445,7 +473,7 @@ button:hover, .btn:hover {
     margin: 15px 0;
 }
 
-/* Blog Actions - Better alignment */
+/* Blog post actions (edit, delete, like, etc.) */
 .blog-actions {
     margin-top: 20px;
     padding-top: 20px;
@@ -478,7 +506,9 @@ button:hover, .btn:hover {
     color: white;
 }
 
-/* Forms - Better styling */
+/* =========================================
+   FORM STYLING
+   ========================================= */
 .form-container {
     max-width: 600px;
     margin: 50px auto;
@@ -505,6 +535,7 @@ button:hover, .btn:hover {
     color: #2c3e50;
 }
 
+/* Input field styling */
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -532,7 +563,7 @@ textarea {
     resize: vertical;
 }
 
-/* Login button specific styles */
+/* Login button specific styling */
 .login-form button[type="submit"] {
     background-color: #2ecc71;
     color: white;
@@ -544,7 +575,9 @@ textarea {
     background-color: #27ae60;
 }
 
-/* Pagination */
+/* =========================================
+   PAGINATION STYLING
+   ========================================= */
 .pagination {
     text-align: center;
     margin-top: 40px;
@@ -576,7 +609,9 @@ textarea {
     border-radius: 5px;
 }
 
-/* Utility Classes */
+/* =========================================
+   UTILITY CLASSES
+   ========================================= */
 .text-center {
     text-align: center;
 }
@@ -589,7 +624,9 @@ textarea {
     margin-top: 20px;
 }
 
-/* Message System Styles */
+/* =========================================
+   MESSAGE SYSTEM STYLES
+   ========================================= */
 .message-container {
     display: flex;
     justify-content: center;
@@ -609,16 +646,17 @@ textarea {
     border: 2px solid transparent;
 }
 
+/* Message type indicator styles */
 .message-box.success {
-    border-color: #2ecc71;
+    border-color: #2ecc71; /* Green border for success */
 }
 
 .message-box.error {
-    border-color: #e74c3c;
+    border-color: #e74c3c; /* Red border for errors */
 }
 
 .message-box.info {
-    border-color: #3498db;
+    border-color: #3498db; /* Blue border for info */
 }
 
 .message-icon {
@@ -665,7 +703,9 @@ textarea {
     padding: 12px 30px;
 }
 
-/* Fix profile page spacing */
+/* =========================================
+   PROFILE PAGE SPACING
+   ========================================= */
 .form-container hr {
     margin: 30px 0;
     border: none;
@@ -691,22 +731,28 @@ textarea {
     text-decoration: underline;
 }
 
-/* Responsive */
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
 @media (max-width: 768px) {
+    /* Stack posts in single column on smaller screens */
     .posts-grid {
         grid-template-columns: 1fr;
     }
     
+    /* Stack search form elements vertically */
     .search-form {
         flex-direction: column;
     }
     
+    /* Full width form elements on mobile */
     .search-form input[type="text"],
     .search-form select,
     .search-form button {
         width: 100%;
     }
     
+    /* Adjust blog actions for smaller screens */
     .blog-actions {
         flex-direction: column;
         align-items: stretch;
@@ -717,6 +763,7 @@ textarea {
         justify-content: center;
     }
     
+    /* Stack navigation on mobile */
     nav .nav-content {
         flex-direction: column;
         gap: 15px;
@@ -727,6 +774,7 @@ textarea {
     }
 }
 
+/* Extra small device adjustments */
 @media (max-width: 480px) {
     .container {
         padding: 10px;

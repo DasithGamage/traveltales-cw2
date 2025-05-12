@@ -3,9 +3,12 @@
 <div class="form-container">
   <h2>Answer Security Questions</h2>
   
+  <!-- Security questions form for password reset verification -->
   <form action="/reset-password" method="POST">
+    <!-- Hidden field to pass email to next step -->
     <input type="hidden" name="email" value="<%= email %>">
     
+    <!-- Security questions set during registration -->
     <div class="form-group">
       <label>What is your mother's first name?</label>
       <input type="text" name="answer1" required>

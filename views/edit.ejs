@@ -3,22 +3,27 @@
 <div class="form-container">
   <h2>Edit Blog Post</h2>
 
+  <!-- Form for editing an existing blog post -->
   <form method="POST">
+    <!-- Pre-filled title field with existing content -->
     <div class="form-group">
       <label for="title">Title:</label>
       <input type="text" id="title" name="title" value="<%= blog.title %>" required>
     </div>
 
+    <!-- Pre-filled content textarea with existing blog content -->
     <div class="form-group">
       <label for="content">Content:</label>
       <textarea id="content" name="content" required><%= blog.content %></textarea>
     </div>
 
+    <!-- Pre-filled country field -->
     <div class="form-group">
       <label for="country">Country:</label>
       <input type="text" id="country" name="country" value="<%= blog.country %>">
     </div>
 
+    <!-- Pre-filled visit date -->
     <div class="form-group">
       <label for="visit_date">Visit Date:</label>
       <input type="date" id="visit_date" name="visit_date" value="<%= blog.visit_date %>">
