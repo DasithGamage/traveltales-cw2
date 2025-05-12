@@ -204,6 +204,16 @@ const blogController = {
           });
         });
 
+        // Get user's current reaction to the blog post
+        if (req.session.user) {
+          await new Promise(resolve => {
+            likeModel.getUserReaction(req.session.user.id, blog.id, (err, result) => {
+              blog.userReaction = result ? result.type : null;
+              resolve();
+            });
+          });
+        }
+
         // Check if current user is following the blog author
         if (req.session.user) {
           await new Promise(resolve => {
@@ -282,6 +292,16 @@ const blogController = {
               resolve();
             });
           });
+
+          // Get user's current reaction to the blog post
+          if (userId) {
+            await new Promise(resolve => {
+              likeModel.getUserReaction(userId, blog.id, (err, result) => {
+                blog.userReaction = result ? result.type : null;
+                resolve();
+              });
+            });
+          }
 
           // Add country information if not already in cache
           if (blog.country && !countryCache[blog.country.toLowerCase()]) {
@@ -576,6 +596,16 @@ const blogController = {
             resolve();
           });
         });
+
+        // Get user's current reaction to the blog post
+        if (userId) {
+          await new Promise(resolve => {
+            likeModel.getUserReaction(userId, blog.id, (err, result) => {
+              blog.userReaction = result ? result.type : null;
+              resolve();
+            });
+          });
+        }
 
         // Add country information if not already in cache
         if (blog.country && !countryCache[blog.country.toLowerCase()]) {

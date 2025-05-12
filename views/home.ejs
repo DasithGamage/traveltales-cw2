@@ -214,12 +214,14 @@ document.getElementById('countryDropdown').addEventListener('change', function(e
         <!-- Like/Dislike counters and buttons -->
         <div class="right-actions">
           <span style="margin-right: 15px;">👍 <%= blog.likes %> | 👎 <%= blog.dislikes %></span>
-          <form action="/like/<%= blog.id %>" method="POST">
-            <button type="submit" class="like-btn">👍 Like</button>
-          </form>
-          <form action="/dislike/<%= blog.id %>" method="POST">
-            <button type="submit" class="dislike-btn">👎 Dislike</button>
-          </form>
+          <% if (session && session.user) { %>
+            <form action="/like/<%= blog.id %>" method="POST" style="display: inline;">
+              <button type="submit" class="like-btn">👍 <%= blog.userReaction === 'like' ? 'Liked' : 'Like' %></button>
+            </form>
+            <form action="/dislike/<%= blog.id %>" method="POST" style="display: inline;">
+              <button type="submit" class="dislike-btn">👎 <%= blog.userReaction === 'dislike' ? 'Disliked' : 'Dislike' %></button>
+            </form>
+          <% } %>
         </div>
       </div>
     </div>
